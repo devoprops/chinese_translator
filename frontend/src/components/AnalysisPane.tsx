@@ -14,6 +14,7 @@ interface CharacterAnalysisSectionProps {
 const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ analysisData }) => {
   const [translations, setTranslations] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   // Group characters by words
   const wordGroups: Array<typeof analysisData.character_analysis> = [];
@@ -37,7 +38,17 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
 
   // Fetch batch translations when component mounts
   React.useEffect(() => {
+    // Prevent multiple simultaneous requests
+    if (isTranslating) {
+      console.log('Translation already in progress, skipping...');
+      return;
+    }
+
+    console.log('CharacterAnalysisSection useEffect triggered');
+    console.log('wordGroups.length:', wordGroups.length);
+    
     const fetchBatchTranslations = async () => {
+      setIsTranslating(true);
       setLoading(true);
       
       // Collect all unique words and characters to translate
@@ -46,43 +57,64 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
       // Add word groups
       wordGroups.forEach(wordGroup => {
         const word = wordGroup[0]?.word || wordGroup.map(c => c.character).join('');
-        if (word && word.length > 0) {
-          itemsToTranslate.add(word);
+        if (word && word.trim().length > 0) {
+          itemsToTranslate.add(word.trim());
         }
       });
       
       // Add individual characters (excluding punctuation)
       analysisData.character_analysis.forEach(char => {
         const isPunctuation = /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character);
-        if (char.character && '\u4e00' <= char.character <= '\u9fff' && !isPunctuation) {
+        if (char.character && char.character >= '\u4e00' && char.character <= '\u9fff' && !isPunctuation) {
           itemsToTranslate.add(char.character);
         }
       });
       
+      // Remove any items we already have translations for
+      const itemsArray = Array.from(itemsToTranslate).filter(item => !translations[item]);
+      
+      if (itemsArray.length === 0) {
+        console.log('All items already translated, skipping API call');
+        setLoading(false);
+        setIsTranslating(false);
+        return;
+      }
+      
       try {
+        console.log('Sending batch translation request for', itemsArray.length, 'new items:', itemsArray);
+        
         const response = await fetch('/api/translate-batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: Array.from(itemsToTranslate) })
+          body: JSON.stringify({ items: itemsArray })
         });
         
         if (response.ok) {
           const data = await response.json();
-          setTranslations(data.translations || {});
+          console.log('Batch translation response:', data);
+          // Merge with existing translations
+          setTranslations(prev => ({ ...prev, ...data.translations }));
         } else {
-          console.error('Batch translation failed');
+          console.error('Batch translation failed with status:', response.status);
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
         }
       } catch (error) {
         console.error('Error fetching batch translations:', error);
       } finally {
         setLoading(false);
+        setIsTranslating(false);
       }
     };
 
     if (wordGroups.length > 0) {
+      console.log('Calling fetchBatchTranslations...');
       fetchBatchTranslations();
+    } else {
+      console.log('No word groups found, skipping batch translation');
+      setLoading(false);
     }
-  }, [analysisData]);
+  }, [analysisData, isTranslating, translations]);
 
   return (
     <div>

@@ -54,30 +54,101 @@ def translate_batch():
         data = request.get_json()
         items = data.get('items', [])
         
+        print(f"Batch translation request received for {len(items)} items: {items}")
+        
         if not items:
             return jsonify({'error': 'No items provided'}), 400
         
-        # Create CSV string from items
-        csv_text = ', '.join(items)
-        
-        # Get translation from Google Translate API
-        batch_translation = translation_service.translate(csv_text)
-        
-        # Parse the result back into individual translations
+        # Step 1: First try local dictionaries (fastest)
         translations = {}
-        if batch_translation:
-            # Split by comma and clean up
-            translated_parts = [part.strip() for part in batch_translation.split(',')]
-            
-            # Map original items to translations
-            for i, item in enumerate(items):
-                if i < len(translated_parts):
-                    translations[item] = translated_parts[i]
-                else:
-                    translations[item] = 'Unknown'
+        dictionary_hits = []
+        needs_translation = []
         
+        for item in items:
+            if len(item) == 1 and '\u4e00' <= item <= '\u9fff':
+                # Single character - try character dictionary first
+                dict_result = translation_service.get_character_fallback(item)
+                if dict_result != 'Unknown':
+                    translations[item] = dict_result
+                    dictionary_hits.append(item)
+                    print(f"Character dictionary hit: '{item}' -> '{dict_result}'")
+                else:
+                    needs_translation.append(item)
+            else:
+                # Multi-character word - try phrase dictionary first
+                phrase_result = translation_service.get_phrase_fallback(item)
+                if phrase_result != 'Unknown':
+                    translations[item] = phrase_result
+                    dictionary_hits.append(item)
+                    print(f"Phrase dictionary hit: '{item}' -> '{phrase_result}'")
+                else:
+                    needs_translation.append(item)
+        
+        print(f"Dictionary resolved {len(dictionary_hits)} items, need translation for {len(needs_translation)} items")
+        
+        # Step 2: Batch translate remaining items (efficient)
+        if needs_translation:
+            csv_text = ', '.join(needs_translation)
+            print(f"CSV text to translate: {csv_text}")
+            
+            batch_translation = translation_service.translate(csv_text)
+            print(f"Batch translation result: {batch_translation}")
+            
+            if batch_translation:
+                # Parse CSV response
+                translated_parts = [part.strip() for part in batch_translation.split(',')]
+                print(f"Parsed translation parts: {translated_parts}")
+                
+                # Map batch results to original items
+                batch_failures = []
+                for i, item in enumerate(needs_translation):
+                    if i < len(translated_parts):
+                        batch_result = translated_parts[i]
+                        # Check if batch translation is meaningful
+                        if batch_result and batch_result != item and batch_result.lower() not in ['unknown', item.lower()]:
+                            translations[item] = batch_result
+                            print(f"Batch success: '{item}' -> '{batch_result}'")
+                        else:
+                            # Batch failed for this item
+                            batch_failures.append(item)
+                            print(f"Batch failed for: '{item}' (got '{batch_result}')")
+                    else:
+                        # Not enough parts in batch response
+                        batch_failures.append(item)
+                        print(f"Batch incomplete for: '{item}'")
+                
+                # Step 3: Individual translation for remaining failures (last resort)
+                if batch_failures:
+                    print(f"Need individual translation for {len(batch_failures)} items: {batch_failures}")
+                    
+                    for item in batch_failures:
+                        try:
+                            individual_translation = translation_service.translate(item)
+                            print(f"Individual fallback: '{item}' -> '{individual_translation}'")
+                            
+                            if individual_translation and individual_translation != item and individual_translation.lower() != 'unknown':
+                                translations[item] = individual_translation
+                            else:
+                                translations[item] = 'Unknown'
+                        except Exception as e:
+                            print(f"Error in individual translation for '{item}': {e}")
+                            translations[item] = 'Unknown'
+            else:
+                # Batch translation completely failed, try individual for all
+                print("Batch translation failed, trying individual translations")
+                for item in needs_translation:
+                    try:
+                        individual_translation = translation_service.translate(item)
+                        print(f"Individual translation: '{item}' -> '{individual_translation}'")
+                        translations[item] = individual_translation or 'Unknown'
+                    except Exception as e:
+                        print(f"Error in individual translation for '{item}': {e}")
+                        translations[item] = 'Unknown'
+        
+        print(f"Final translations mapping: {translations}")
         return jsonify({'translations': translations})
     except Exception as e:
+        print(f"Batch translation error: {e}")
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/pinyin', methods=['POST'])
