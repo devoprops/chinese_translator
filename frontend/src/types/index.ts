@@ -16,6 +16,11 @@ export interface CharacterAnalysis {
   character: string;
   pinyin: string;
   meaning: string;
+  word?: string;
+  word_position?: number;
+  word_length?: number;
+  is_word_start?: boolean;
+  is_word_end?: boolean;
 }
 
 export interface CharacterInfo {

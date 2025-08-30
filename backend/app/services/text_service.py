@@ -1,4 +1,5 @@
 import re
+import jieba
 from typing import Dict, List, Any
 from app.services.pinyin_service import PinyinService
 from app.services.translation_service import TranslationService
@@ -48,25 +49,46 @@ class TextService:
         sentences = re.split(r'[。！？\n]+', text)
         return [s.strip() for s in sentences if s.strip()]
     
-    def analyze_characters(self, text: str) -> List[Dict[str, str]]:
-        """Analyze each character in the text using proper services"""
+    def analyze_characters(self, text: str) -> List[Dict[str, Any]]:
+        """Analyze each character in the text using proper services with word grouping"""
         analysis = []
-        for char in text:
-            if '\u4e00' <= char <= '\u9fff':  # Chinese character range
-                # Use PinyinService for better character coverage
-                char_pinyin = self._get_character_pinyin(char)
-                analysis.append({
-                    'character': char,
-                    'pinyin': char_pinyin,
-                    'meaning': self._get_character_meaning(char)
-                })
-            else:
-                # Handle non-Chinese characters (spaces, punctuation, etc.)
-                analysis.append({
-                    'character': char,
-                    'pinyin': char,
-                    'meaning': char
-                })
+        
+        # First, segment the text into words using jieba
+        words = list(jieba.cut(text, cut_all=False))
+        
+        # Track position in original text
+        char_index = 0
+        
+        for word in words:
+            # For each word, analyze its characters
+            for i, char in enumerate(word):
+                if '\u4e00' <= char <= '\u9fff':  # Chinese character range
+                    # Use PinyinService for better character coverage
+                    char_pinyin = self._get_character_pinyin(char)
+                    analysis.append({
+                        'character': char,
+                        'pinyin': char_pinyin,
+                        'meaning': self._get_character_meaning(char),
+                        'word': word,  # The complete word this character belongs to
+                        'word_position': i,  # Position within the word (0 = first char)
+                        'word_length': len(word),  # Total length of the word
+                        'is_word_start': i == 0,  # True if this is the first character of a word
+                        'is_word_end': i == len(word) - 1  # True if this is the last character of a word
+                    })
+                else:
+                    # Handle non-Chinese characters (spaces, punctuation, etc.)
+                    analysis.append({
+                        'character': char,
+                        'pinyin': char,
+                        'meaning': char,
+                        'word': char,
+                        'word_position': 0,
+                        'word_length': 1,
+                        'is_word_start': True,
+                        'is_word_end': True
+                    })
+                char_index += 1
+        
         return analysis
     
     def get_character_info(self, char: str) -> Dict[str, Any]:

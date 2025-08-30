@@ -51,13 +51,47 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
       <div>
         <h2 className="text-xl font-semibold mb-3 text-gray-800">Chinese Text with Pinyin</h2>
         <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="flex flex-wrap gap-2">
-            {analysisData.character_analysis.map((char, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="chinese-character text-3xl mb-1">{char.character}</div>
-                <div className="pinyin-text text-sm text-gray-600">{char.pinyin}</div>
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-6">
+            {(() => {
+              // Group characters by words
+              const wordGroups: Array<typeof analysisData.character_analysis> = [];
+              let currentGroup: typeof analysisData.character_analysis = [];
+              
+              analysisData.character_analysis.forEach((char, index) => {
+                currentGroup.push(char);
+                if (char.is_word_end || index === analysisData.character_analysis.length - 1) {
+                  wordGroups.push([...currentGroup]);
+                  currentGroup = [];
+                }
+              });
+              
+              return wordGroups.map((wordGroup, groupIndex) => (
+                <div key={groupIndex} className="flex flex-col items-center">
+                  {/* Row 1: Chinese characters in tight horizontal layout */}
+                  <div className="flex gap-1 mb-1">
+                    {wordGroup.map((char, charIndex) => (
+                      <div key={charIndex} className="chinese-character text-3xl">
+                        {char.character}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Row 2: Pinyin in tight horizontal layout */}
+                  <div className="flex gap-1 mb-2">
+                    {wordGroup.map((char, charIndex) => (
+                      <div key={charIndex} className="pinyin-text text-sm text-gray-600 text-center min-w-[2rem]">
+                        {char.pinyin}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Row 3: Complete word (grouped characters) */}
+                  <div className="text-xs text-blue-500 opacity-70 text-center">
+                    {wordGroup[0]?.word || wordGroup.map(c => c.character).join('')}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         </div>
       </div>

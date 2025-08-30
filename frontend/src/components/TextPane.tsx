@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextData } from '../types';
+import { TextData } from '../types/index';
 
 interface TextPaneProps {
   textData: TextData | null;
@@ -113,30 +113,32 @@ const TextPane: React.FC<TextPaneProps> = ({
 
       {/* Text content */}
       {textData ? (
-        <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
-          💡 <strong>Tip:</strong> Select any Chinese text with your mouse to analyze it
-        </div>
-        
-        <div 
-          className="chinese-text text-lg leading-relaxed whitespace-pre-wrap select-text cursor-text"
-          onMouseUp={handleTextSelection}
-        >
-          {textData.content}
+        <div>
+          <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
+            💡 <strong>Tip:</strong> Select any Chinese text with your mouse to analyze it
+          </div>
           
-          {/* Show selected text for analysis */}
-          {selectedSentence && (
-            <div className="mt-6 p-3 bg-green-50 border-l-4 border-green-500 rounded-r">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-700">Selected for analysis:</span>
-                <span className="text-sm text-gray-500">
-                  {selectedSentence.length} characters
-                </span>
+          <div 
+            className="chinese-text text-lg leading-relaxed whitespace-pre-wrap select-text cursor-text"
+            onMouseUp={handleTextSelection}
+          >
+            {textData.content}
+            
+            {/* Show selected text for analysis */}
+            {selectedSentence && (
+              <div className="mt-6 p-3 bg-green-50 border-l-4 border-green-500 rounded-r">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-700">Selected for analysis:</span>
+                  <span className="text-sm text-gray-500">
+                    {selectedSentence.length} characters
+                  </span>
+                </div>
+                <div className="text-green-800 font-medium chinese-text text-lg">
+                  "{selectedSentence}"
+                </div>
               </div>
-              <div className="text-green-800 font-medium chinese-text text-lg">
-                "{selectedSentence}"
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         <div className="text-center py-12 text-gray-500">
