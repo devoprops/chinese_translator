@@ -13,9 +13,9 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const processText = (rawText: string) => {
-    // Simple text processing to split into sentences
+    // Split into sentences while preserving paragraph structure
     const sentences = rawText
-      .split(/[。！？\n]+/)
+      .split(/(?<=[。！？])/)
       .map(s => s.trim())
       .filter(s => s.length > 0);
 

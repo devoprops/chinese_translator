@@ -23,9 +23,12 @@ class TranslationService:
                 return self.common_phrases[text]
             
             # Use Google Translate API for dynamic translation
-            return self._google_translate(text)
+            result = self._google_translate(text)
+            print(f"Google Translate result: {result}")
+            return result
             
         except Exception as e:
+            print(f"Translation failed, using fallback: {e}")
             # Fallback to basic character translation if API fails
             return self._fallback_translation(text)
     
