@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AnalysisData } from '../types';
 
 interface AnalysisPaneProps {
@@ -6,6 +6,144 @@ interface AnalysisPaneProps {
   analysisData: AnalysisData | null;
   loading: boolean;
 }
+
+interface CharacterAnalysisSectionProps {
+  analysisData: AnalysisData;
+}
+
+const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ analysisData }) => {
+  const [translations, setTranslations] = useState<{[key: string]: string}>({});
+  const [loading, setLoading] = useState(true);
+
+  // Group characters by words
+  const wordGroups: Array<typeof analysisData.character_analysis> = [];
+  let currentGroup: typeof analysisData.character_analysis = [];
+  
+  analysisData.character_analysis.forEach((char, index) => {
+    // Skip punctuation characters
+    const isPunctuation = /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character);
+    
+    if (!isPunctuation) {
+      currentGroup.push(char);
+    }
+    
+    if (char.is_word_end || index === analysisData.character_analysis.length - 1) {
+      if (currentGroup.length > 0) {
+        wordGroups.push([...currentGroup]);
+        currentGroup = [];
+      }
+    }
+  });
+
+  // Fetch batch translations when component mounts
+  React.useEffect(() => {
+    const fetchBatchTranslations = async () => {
+      setLoading(true);
+      
+      // Collect all unique words and characters to translate
+      const itemsToTranslate = new Set<string>();
+      
+      // Add word groups
+      wordGroups.forEach(wordGroup => {
+        const word = wordGroup[0]?.word || wordGroup.map(c => c.character).join('');
+        if (word && word.length > 0) {
+          itemsToTranslate.add(word);
+        }
+      });
+      
+      // Add individual characters (excluding punctuation)
+      analysisData.character_analysis.forEach(char => {
+        const isPunctuation = /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character);
+        if (char.character && '\u4e00' <= char.character <= '\u9fff' && !isPunctuation) {
+          itemsToTranslate.add(char.character);
+        }
+      });
+      
+      try {
+        const response = await fetch('/api/translate-batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: Array.from(itemsToTranslate) })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setTranslations(data.translations || {});
+        } else {
+          console.error('Batch translation failed');
+        }
+      } catch (error) {
+        console.error('Error fetching batch translations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (wordGroups.length > 0) {
+      fetchBatchTranslations();
+    }
+  }, [analysisData]);
+
+  return (
+    <div>
+      <h2 className="text-xl font-semibold mb-3 text-gray-800">Character Analysis</h2>
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">Loading translations...</div>
+            </div>
+          ) : (
+            wordGroups.map((wordGroup, groupIndex) => {
+              const word = wordGroup[0]?.word || wordGroup.map(c => c.character).join('');
+              const pinyin = wordGroup.map(c => c.pinyin).join(' ');
+              // Use the batch translation, fallback to first character's meaning
+              const translation = translations[word] || wordGroup[0]?.meaning || 'Unknown';
+            
+            return (
+              <div key={groupIndex} className="flex gap-4 overflow-x-auto">
+                {/* Word Group */}
+                <div className="flex flex-col items-center p-3 bg-blue-50 border border-blue-200 rounded-lg min-w-[120px] flex-shrink-0">
+                  {/* Row 1: Characters */}
+                  <div className="chinese-character mb-1">
+                    {word}
+                  </div>
+                  {/* Row 2: Pinyin */}
+                  <div className="text-sm text-gray-600 mb-1 text-center">
+                    {pinyin}
+                  </div>
+                  {/* Row 3: Translation */}
+                  <div className="text-xs text-blue-600 text-center max-w-[120px] break-words">
+                    {translation}
+                  </div>
+                </div>
+
+                {/* Individual Characters for this group */}
+                {wordGroup.map((char, charIndex) => (
+                  <div key={`${groupIndex}-${charIndex}`} className="flex flex-col items-center p-3 bg-green-50 border border-green-200 rounded-lg min-w-[100px] flex-shrink-0">
+                    {/* Row 1: Character */}
+                    <div className="chinese-character mb-1">
+                      {char.character}
+                    </div>
+                    {/* Row 2: Pinyin */}
+                    <div className="text-sm text-gray-600 mb-1 text-center">
+                      {char.pinyin}
+                    </div>
+                    {/* Row 3: Meaning */}
+                    <div className="text-xs text-green-600 text-center max-w-[100px] break-words">
+                      {translations[char.character] || char.meaning}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AnalysisPane: React.FC<AnalysisPaneProps> = ({
   selectedSentence,
@@ -47,6 +185,22 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Original Sentence */}
+      <div>
+        <h2 className="text-xl font-semibold mb-3 text-gray-800">Original Sentence</h2>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="chinese-text text-lg leading-relaxed">{analysisData.original}</p>
+        </div>
+      </div>
+
+      {/* Translation */}
+      <div>
+        <h2 className="text-xl font-semibold mb-3 text-gray-800">Translation</h2>
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-gray-800 leading-relaxed">{analysisData.translation}</p>
+        </div>
+      </div>
+
       {/* Chinese Text with Pinyin */}
       <div>
         <h2 className="text-xl font-semibold mb-3 text-gray-800">Chinese Text with Pinyin</h2>
@@ -96,29 +250,8 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
         </div>
       </div>
 
-      {/* Translation */}
-      <div>
-        <h2 className="text-xl font-semibold mb-3 text-gray-800">Translation</h2>
-        <div className="p-4 bg-green-50 rounded-lg">
-          <p className="text-lg">{analysisData.translation}</p>
-        </div>
-      </div>
-
-      {/* Character Analysis */}
-      <div>
-        <h2 className="text-xl font-semibold mb-3 text-gray-800">Character Analysis</h2>
-        <div className="character-analysis">
-          {analysisData.character_analysis.map((char, index) => (
-            <div key={index} className="character-item">
-              <div className="character-char">{char.character}</div>
-              <div className="character-info">
-                <div className="character-pinyin">{char.pinyin}</div>
-                <div className="character-meaning">{char.meaning}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Character Analysis - Two Pane Layout */}
+      <CharacterAnalysisSection analysisData={analysisData} />
     </div>
   );
 };

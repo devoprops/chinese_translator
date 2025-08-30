@@ -57,6 +57,168 @@ const TextPane: React.FC<TextPaneProps> = ({
     }
   };
 
+  const handleDoubleClick = (event: React.MouseEvent) => {
+    event.preventDefault(); // Prevent default double-click selection
+    event.stopPropagation(); // Stop event bubbling
+    
+    if (!textData) return;
+    
+    // Clear any existing selection immediately
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+    }
+    
+    // Use setTimeout to ensure our logic runs after any native selection
+    setTimeout(() => {
+      // Get the click position using cross-browser method
+      let range: Range | null = null;
+      
+      if (document.caretRangeFromPoint) {
+        // WebKit browsers
+        range = document.caretRangeFromPoint(event.clientX, event.clientY);
+      } else if ((document as any).caretPositionFromPoint) {
+        // Firefox
+        const caretPosition = (document as any).caretPositionFromPoint(event.clientX, event.clientY);
+        if (caretPosition) {
+          range = document.createRange();
+          range.setStart(caretPosition.offsetNode, caretPosition.offset);
+          range.collapse(true);
+        }
+      }
+      
+      if (!range) return;
+      
+      // Find the sentence at this position
+      const sentence = findSentenceAtPosition(range);
+      if (sentence) {
+        // Clear selection again before setting our custom selection
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+        }
+        
+        // Manually select the sentence text
+        selectTextInDOM(sentence);
+        onSentenceSelect(sentence, -1);
+      }
+    }, 0); // Run on next tick
+  };
+
+  const findSentenceAtPosition = (range: Range): string | null => {
+    if (!textData) return null;
+    
+    // Get the character position in the text
+    const textContainer = range.startContainer.parentElement?.closest('.chinese-text');
+    if (!textContainer) return null;
+    
+    // Get all text content and find position
+    const fullText = textData.content;
+    const beforeRange = document.createRange();
+    beforeRange.setStart(textContainer, 0);
+    beforeRange.setEnd(range.startContainer, range.startOffset);
+    const position = beforeRange.toString().length;
+    
+    // Find sentence boundaries around this position
+    const sentenceStart = findSentenceStart(fullText, position);
+    const sentenceEnd = findSentenceEnd(fullText, position);
+    const foundSentence = fullText.substring(sentenceStart, sentenceEnd).trim();
+    
+    // If the found sentence is very short (like just "氣功"), 
+    // try to find a longer sentence from the pre-split sentences
+    if (foundSentence.length < 6) {
+      const textAtPosition = fullText.substring(Math.max(0, position - 2), position + 3);
+      for (const sentence of textData.sentences) {
+        if (sentence.includes(textAtPosition) && sentence.length > foundSentence.length) {
+          return sentence;
+        }
+      }
+    }
+    
+    return foundSentence;
+  };
+
+  const findSentenceStart = (text: string, position: number): number => {
+    // Look backward for sentence endings first
+    for (let i = position; i >= 0; i--) {
+      if (text[i] === '。' || text[i] === '！' || text[i] === '？') {
+        return i + 1; // Start after the period
+      }
+    }
+    
+    // If no period found, look for paragraph breaks (more generous)
+    for (let i = position; i >= 0; i--) {
+      if (text.substring(i, i + 2) === '\n\n') {
+        return i + 2;
+      }
+    }
+    
+    // If no double newline, look for single newline
+    for (let i = position; i >= 0; i--) {
+      if (text[i] === '\n') {
+        return i + 1;
+      }
+    }
+    
+    return 0; // Start of text
+  };
+
+  const findSentenceEnd = (text: string, position: number): number => {
+    // Look forward for sentence endings first
+    for (let i = position; i < text.length; i++) {
+      if (text[i] === '。' || text[i] === '！' || text[i] === '？') {
+        return i + 1; // Include the period
+      }
+    }
+    
+    // If no period found, look for paragraph breaks (more generous)
+    for (let i = position; i < text.length; i++) {
+      if (text.substring(i, i + 2) === '\n\n') {
+        return i;
+      }
+    }
+    
+    // If no double newline, look for single newline
+    for (let i = position; i < text.length; i++) {
+      if (text[i] === '\n') {
+        return i;
+      }
+    }
+    
+    return text.length; // End of text
+  };
+
+  const selectTextInDOM = (text: string) => {
+    // Find and select the text in the DOM
+    const textContainer = document.querySelector('.chinese-text');
+    if (!textContainer) return;
+    
+    const walker = document.createTreeWalker(
+      textContainer,
+      NodeFilter.SHOW_TEXT
+    );
+    
+    let node;
+    while (node = walker.nextNode()) {
+      const nodeText = node.textContent || '';
+      const index = nodeText.indexOf(text);
+      if (index !== -1) {
+        const range = document.createRange();
+        range.setStart(node, index);
+        range.setEnd(node, index + text.length);
+        
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        break;
+      }
+    }
+  };
+
+
+
   return (
     <div className="p-6">
       {/* Header with controls */}
@@ -115,12 +277,13 @@ const TextPane: React.FC<TextPaneProps> = ({
       {textData ? (
         <div>
           <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
-            💡 <strong>Tip:</strong> Select any Chinese text with your mouse to analyze it
+            💡 <strong>Tip:</strong> Double-click any Chinese text to analyze the entire sentence
           </div>
           
           <div 
             className="chinese-text text-lg leading-relaxed whitespace-pre-wrap select-text cursor-text"
             onMouseUp={handleTextSelection}
+            onDoubleClick={handleDoubleClick}
           >
             {textData.content}
             

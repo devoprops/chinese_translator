@@ -32,6 +32,54 @@ def translate_text():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@api_bp.route('/translate-word', methods=['POST'])
+def translate_word():
+    """Translate a single Chinese word to English"""
+    try:
+        data = request.get_json()
+        word = data.get('word', '')
+        
+        if not word:
+            return jsonify({'error': 'No word provided'}), 400
+        
+        translation = translation_service.translate(word)
+        return jsonify({'translation': translation})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/translate-batch', methods=['POST'])
+def translate_batch():
+    """Translate multiple Chinese words/characters in one API call"""
+    try:
+        data = request.get_json()
+        items = data.get('items', [])
+        
+        if not items:
+            return jsonify({'error': 'No items provided'}), 400
+        
+        # Create CSV string from items
+        csv_text = ', '.join(items)
+        
+        # Get translation from Google Translate API
+        batch_translation = translation_service.translate(csv_text)
+        
+        # Parse the result back into individual translations
+        translations = {}
+        if batch_translation:
+            # Split by comma and clean up
+            translated_parts = [part.strip() for part in batch_translation.split(',')]
+            
+            # Map original items to translations
+            for i, item in enumerate(items):
+                if i < len(translated_parts):
+                    translations[item] = translated_parts[i]
+                else:
+                    translations[item] = 'Unknown'
+        
+        return jsonify({'translations': translations})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @api_bp.route('/pinyin', methods=['POST'])
 def generate_pinyin():
     """Generate pinyin for Chinese text"""

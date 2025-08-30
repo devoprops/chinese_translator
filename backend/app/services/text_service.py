@@ -141,8 +141,8 @@ class TextService:
         return pinyin_dict.get(char, char)
     
     def _get_character_meaning(self, char: str) -> str:
-        """Get English meaning for a character"""
-        # This would integrate with a Chinese dictionary API
+        """Get English meaning for a character (will be overridden by batch translation)"""
+        # Use local dictionary as placeholder - will be replaced by batch translation
         meaning_dict = {
             '轉': 'turn, rotate', '法': 'law, method', '輪': 'wheel, round',
             '李': 'plum', '洪': 'flood, vast', '志': 'will, purpose',
@@ -170,7 +170,22 @@ class TextService:
             '員': 'member, person', '收': 'receive, collect', '到': 'arrive, reach',
             '的': 'possessive particle', '效': 'effect, result', '果': 'fruit, result',
             '影': 'shadow, image', '響': 'sound, influence', '也': 'also, too',
-            '比': 'compare, than', '較': 'compare, relatively'
+            '比': 'compare, than', '較': 'compare, relatively',
+            # Add more common characters that were showing as "Unknown"
+            '能': 'able, capable', '夠': 'enough, sufficient', '直': 'straight, direct',
+            '接': 'connect, receive', '聽': 'hear, listen', '到': 'arrive, reach',
+            '覺': 'feel, perceive', '得': 'get, obtain', '很': 'very, quite',
+            '奇': 'strange, odd', '怪': 'strange, weird', '這': 'this', '個': 'classifier',
+            '師': 'teacher, master', '父': 'father', '怎': 'how', '會': 'can, able',
+            '知': 'know', '道': 'way, path', '呢': 'particle', '因': 'because',
+            '國': 'country', '全': 'complete, whole', '形': 'form, shape', '勢': 'power, situation',
+            '都': 'all, both', '現': 'now, present', '代': 'generation, era', '科': 'science',
+            '醫': 'medicine, doctor', '所': 'place, location', '能': 'able, can',
+            '解': 'solve, explain', '釋': 'explain, interpret', '但': 'but, however',
+            '它': 'it', '超': 'exceed, surpass', '越': 'surpass, cross', '了': 'particle',
+            '常': 'normal, usual', '理': 'principle, reason', '範': 'scope, range',
+            '圍': 'surround, range', '用': 'use, employ', '普': 'universal, general',
+            '通': 'through, common', '根': 'root, basis'
         }
         return meaning_dict.get(char, 'Unknown')
     
