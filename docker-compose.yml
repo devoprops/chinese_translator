@@ -1,8 +1,6 @@
 # Docker Compose configuration for Chinese Learning App
 # Supports both development and production environments
 
-version: '3.8'
-
 services:
   # Backend service
   backend:
