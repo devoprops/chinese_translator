@@ -1,0 +1,23 @@
+# Docker Compose override for development
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+      - /app/venv
+      - /app/__pycache__
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=True
+    command: python main.py
+
+  frontend:
+    profiles:
+      - prod-build  # Disable in dev, use frontend-dev instead
+
+  frontend-dev:
+    profiles: []  # Enable by default in dev
+

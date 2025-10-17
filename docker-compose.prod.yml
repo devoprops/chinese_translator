@@ -1,0 +1,23 @@
+# Docker Compose override for production
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=False
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 120 main:app
+    volumes: []  # Remove volume mounts in production
+
+  frontend:
+    build:
+      args:
+        - REACT_APP_API_URL=http://localhost:5000
+    profiles: []  # Enable by default in prod
+
+  frontend-dev:
+    profiles:
+      - disabled  # Disable in production
+

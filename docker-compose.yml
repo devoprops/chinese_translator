@@ -1,0 +1,90 @@
+# Docker Compose configuration for Chinese Learning App
+# Supports both development and production environments
+
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chinese-learning-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-True}
+      - FLASK_PORT=5000
+      - HOST=0.0.0.0
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80,http://frontend:80}
+    volumes:
+      # Mount source code for development hot-reload
+      - ./backend:/app
+      - /app/venv
+      - /app/__pycache__
+    command: python main.py
+    networks:
+      - chinese-learning-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5000}
+    container_name: chinese-learning-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - chinese-learning-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend development service (for hot-reload)
+  frontend-dev:
+    image: node:18-alpine
+    container_name: chinese-learning-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm start
+    depends_on:
+      - backend
+    networks:
+      - chinese-learning-network
+    profiles:
+      - dev
+    stdin_open: true
+    tty: true
+
+networks:
+  chinese-learning-network:
+    driver: bridge
+
+# Volume definitions for persistent data
+volumes:
+  backend_data:
+  frontend_node_modules:
+

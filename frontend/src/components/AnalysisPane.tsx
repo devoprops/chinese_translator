@@ -83,7 +83,7 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
       try {
         console.log('Sending batch translation request for', itemsArray.length, 'new items:', itemsArray);
         
-        const response = await fetch('/api/translate-batch', {
+        const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://chinese-study-production.up.railway.app' : ''}/api/translate-batch`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: itemsArray })
@@ -114,7 +114,7 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
       console.log('No word groups found, skipping batch translation');
       setLoading(false);
     }
-  }, [analysisData, isTranslating, translations]);
+  }, [analysisData, isTranslating, translations, wordGroups]);
 
   return (
     <div>

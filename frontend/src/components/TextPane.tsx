@@ -199,7 +199,7 @@ const TextPane: React.FC<TextPaneProps> = ({
     );
     
     let node;
-    while (node = walker.nextNode()) {
+    while ((node = walker.nextNode())) {
       const nodeText = node.textContent || '';
       const index = nodeText.indexOf(text);
       if (index !== -1) {

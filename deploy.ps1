@@ -1,5 +1,9 @@
-Write-Host "🚀 Chinese Learning App Deployment Script" -ForegroundColor Green
-Write-Host "==========================================" -ForegroundColor Green
+Write-Host "🚀 Chinese Learning App - Deployment Preparation" -ForegroundColor Green
+Write-Host "================================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "This script prepares the application for production deployment." -ForegroundColor Yellow
+Write-Host "Use this before deploying to Railway/Cloudflare or other platforms." -ForegroundColor Yellow
+Write-Host ""
 
 # Check if we're in the right directory
 if (-not (Test-Path "README.md")) {
@@ -7,11 +11,36 @@ if (-not (Test-Path "README.md")) {
     exit 1
 }
 
-# Build frontend
-Write-Host "📦 Building frontend..." -ForegroundColor Yellow
+Write-Host "📋 Checking environment files..." -ForegroundColor Cyan
+
+# Check backend environment files
+if (-not (Test-Path "backend\.env.production")) {
+    Write-Host "⚠️  Warning: backend/.env.production not found" -ForegroundColor Yellow
+    Write-Host "   Creating from template..." -ForegroundColor Yellow
+    Copy-Item "backend\.env.example" "backend\.env.production"
+    Write-Host "   Please update backend/.env.production with production values!" -ForegroundColor Red
+}
+
+# Check frontend environment files
+if (-not (Test-Path "frontend\.env.production")) {
+    Write-Host "⚠️  Warning: frontend/.env.production not found" -ForegroundColor Yellow
+    Write-Host "   Creating from template..." -ForegroundColor Yellow
+    Copy-Item "frontend\.env.example" "frontend\.env.production"
+    Write-Host "   Please update frontend/.env.production with production API URL!" -ForegroundColor Red
+}
+
+Write-Host ""
+Write-Host "📦 Building Frontend..." -ForegroundColor Cyan
 Set-Location frontend
+
+# Install dependencies
+Write-Host "Installing dependencies..." -ForegroundColor Yellow
 npm install
+
+# Build for production
+Write-Host "Building production bundle..." -ForegroundColor Yellow
 npm run build
+
 Set-Location ..
 
 # Check if build was successful
@@ -22,10 +51,12 @@ if (-not (Test-Path "frontend/build")) {
 
 Write-Host "✅ Frontend built successfully" -ForegroundColor Green
 
-# Test backend
-Write-Host "🧪 Testing backend..." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "🧪 Testing Backend..." -ForegroundColor Cyan
 Set-Location backend
-python -c "import sys; print(f'Python version: {sys.version}')"
+
+Write-Host "Python version:" -ForegroundColor Yellow
+python -c "import sys; print(f'  {sys.version}')"
 
 # Check if virtual environment exists
 if (-not (Test-Path "venv")) {
@@ -34,32 +65,57 @@ if (-not (Test-Path "venv")) {
 }
 
 # Activate virtual environment
-Write-Host "🔧 Activating virtual environment..." -ForegroundColor Yellow
+Write-Host "Installing dependencies..." -ForegroundColor Yellow
 & "venv\Scripts\Activate.ps1"
-
-# Install dependencies
-Write-Host "📥 Installing Python dependencies..." -ForegroundColor Yellow
-pip install -r requirements.txt
+pip install -q -r requirements.txt
 
 # Test Flask app
-Write-Host "🧪 Testing Flask app..." -ForegroundColor Yellow
-python -c "
-from main import create_app
-app = create_app()
-print('✅ Flask app created successfully')
-"
+Write-Host "Testing Flask app..." -ForegroundColor Yellow
+$testResult = python -c @"
+import sys
+try:
+    from main import create_app
+    app = create_app()
+    print('✅ Flask app created successfully')
+    sys.exit(0)
+except Exception as e:
+    print(f'❌ Error creating Flask app: {e}')
+    sys.exit(1)
+"@
 
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Backend test failed" -ForegroundColor Red
+    Set-Location ..
+    exit 1
+}
+
+Write-Host $testResult -ForegroundColor Green
 Set-Location ..
 
 Write-Host ""
-Write-Host "🎉 Deployment preparation complete!" -ForegroundColor Green
+Write-Host "✅ Deployment preparation complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "1. Backend: Deploy to Railway/Render/Heroku" -ForegroundColor White
-Write-Host "2. Frontend: Deploy to Cloudflare Pages" -ForegroundColor White
-Write-Host "3. Update environment variables" -ForegroundColor White
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Gray
 Write-Host ""
-Write-Host "For detailed instructions, see setup.md" -ForegroundColor White
+Write-Host "📚 Next Steps:" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "For REMOTE deployment:" -ForegroundColor Yellow
+Write-Host "  1. Commit and push changes to GitHub" -ForegroundColor White
+Write-Host "  2. Railway and Cloudflare will auto-deploy" -ForegroundColor White
+Write-Host ""
+Write-Host "For LOCAL testing:" -ForegroundColor Yellow
+Write-Host "  • Development:  .\scripts\dev-local.ps1" -ForegroundColor White
+Write-Host "  • With Docker:  .\scripts\dev-docker.ps1" -ForegroundColor White
+Write-Host "  • Production:   .\scripts\build-prod-local.ps1" -ForegroundColor White
+Write-Host ""
+Write-Host "For detailed instructions:" -ForegroundColor Yellow
+Write-Host "  • Deployment Guide: DEPLOYMENT.md" -ForegroundColor White
+Write-Host "  • README: README.md" -ForegroundColor White
+Write-Host ""
+Write-Host "Current Production URLs:" -ForegroundColor Yellow
+Write-Host "  • Frontend: https://devocosm.com/chinese-study/" -ForegroundColor White
+Write-Host "  • Backend:  https://chinese-study-production.up.railway.app" -ForegroundColor White
+Write-Host ""
 
 
 
