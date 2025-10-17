@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.services.text_service import TextService
 from app.services.translation_service import TranslationService
 from app.services.pinyin_service import PinyinService
+from app.services.dictionary_service import dictionary_service
 
 api_bp = Blueprint('api', __name__)
 text_service = TextService()
@@ -196,6 +197,52 @@ def analyze_text():
             'translation': translation,
             'character_analysis': char_analysis
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/detect-script', methods=['POST'])
+def detect_script():
+    """Detect if text is simplified or traditional Chinese"""
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        script_type = dictionary_service.detect_script_type(text)
+        return jsonify({'scriptType': script_type})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/convert-script', methods=['POST'])
+def convert_script():
+    """Convert between simplified and traditional Chinese"""
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        to_type = data.get('toType', 'traditional')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        if to_type == 'traditional':
+            converted = dictionary_service.convert_to_traditional(text)
+        elif to_type == 'simplified':
+            converted = dictionary_service.convert_to_simplified(text)
+        else:
+            return jsonify({'error': 'Invalid conversion type. Use "traditional" or "simplified"'}), 400
+        
+        return jsonify({'convertedText': converted})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/dictionary/stats', methods=['GET'])
+def get_dictionary_stats():
+    """Get statistics about the loaded dictionary"""
+    try:
+        stats = dictionary_service.get_dictionary_stats()
+        return jsonify(stats)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

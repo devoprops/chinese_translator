@@ -12,7 +12,7 @@ function App() {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const processText = (rawText: string) => {
+  const processText = async (rawText: string) => {
     // Split into sentences while preserving paragraph structure
     const sentences = rawText
       .split(/(?<=[。！？])/)
@@ -27,9 +27,28 @@ function App() {
     };
 
     setTextData(textData);
-    setSelectedSentence('');
-    setCurrentSentenceIndex(-1);
-    setAnalysisData(null);
+    
+    // Auto-start with the first sentence if available
+    if (sentences.length > 0) {
+      const firstSentence = sentences[0];
+      setSelectedSentence(firstSentence);
+      setCurrentSentenceIndex(0);
+      setLoading(true);
+      
+      try {
+        const analysis = await analyzeText(firstSentence);
+        setAnalysisData(analysis);
+      } catch (error) {
+        console.error('Failed to analyze first sentence:', error);
+        setAnalysisData(null);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setSelectedSentence('');
+      setCurrentSentenceIndex(-1);
+      setAnalysisData(null);
+    }
   };
 
   const handleSentenceSelect = async (sentence: string, index: number) => {

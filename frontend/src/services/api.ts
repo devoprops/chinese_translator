@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AnalysisData, TextData, CharacterInfo } from '../types';
+import { AnalysisData, TextData, CharacterInfo, ScriptType, DictionaryStats } from '../types';
 import config from '../config';
 
 // Backend expects /api prefix for all API routes
@@ -58,6 +58,36 @@ export const getCharacterInfo = async (char: string): Promise<CharacterInfo> => 
     return response.data;
   } catch (error) {
     console.error('Error fetching character info:', error);
+    throw error;
+  }
+};
+
+export const detectScriptType = async (text: string): Promise<ScriptType> => {
+  try {
+    const response = await api.post('/detect-script', { text });
+    return response.data.scriptType;
+  } catch (error) {
+    console.error('Error detecting script type:', error);
+    throw error;
+  }
+};
+
+export const convertScript = async (text: string, toType: 'simplified' | 'traditional'): Promise<string> => {
+  try {
+    const response = await api.post('/convert-script', { text, toType });
+    return response.data.convertedText;
+  } catch (error) {
+    console.error('Error converting script:', error);
+    throw error;
+  }
+};
+
+export const getDictionaryStats = async (): Promise<DictionaryStats> => {
+  try {
+    const response = await api.get('/dictionary/stats');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dictionary stats:', error);
     throw error;
   }
 };

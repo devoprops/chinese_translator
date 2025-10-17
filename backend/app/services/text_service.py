@@ -3,6 +3,7 @@ import jieba
 from typing import Dict, List, Any
 from app.services.pinyin_service import PinyinService
 from app.services.translation_service import TranslationService
+from app.services.dictionary_service import dictionary_service
 
 class TextService:
     def __init__(self):
@@ -141,53 +142,14 @@ class TextService:
         return pinyin_dict.get(char, char)
     
     def _get_character_meaning(self, char: str) -> str:
-        """Get English meaning for a character (will be overridden by batch translation)"""
-        # Use local dictionary as placeholder - will be replaced by batch translation
-        meaning_dict = {
-            '轉': 'turn, rotate', '法': 'law, method', '輪': 'wheel, round',
-            '李': 'plum', '洪': 'flood, vast', '志': 'will, purpose',
-            '目': 'eye, item', '錄': 'record, copy', '論': 'discuss, theory',
-            '語': 'language, speech', '第': 'sequence, number', '一': 'one',
-            '講': 'speak, lecture', '真': 'true, real', '正': 'correct, right',
-            '往': 'go, toward', '高': 'high, tall', '層': 'layer, level',
-            '次': 'time, order', '上': 'up, above', '帶': 'bring, lead',
-            '人': 'person, human', '不': 'not, no', '同': 'same, together',
-            '有': 'have, exist', '善': 'good, kind', '忍': 'endure, patience',
-            '是': 'is, are', '衡': 'balance, measure', '量': 'measure, quantity',
-            '好': 'good, well', '壞': 'bad, broken', '唯': 'only, unique',
-            '標': 'mark, sign', '準': 'accurate, standard', '氣': 'qi, energy',
-            '功': 'merit, achievement', '史': 'history', '前': 'before, front',
-            '文': 'writing, culture', '化': 'change, transform', '就': 'just, then',
-            '修': 'cultivate, repair', '煉': 'refine, practice', '為': 'for, as',
-            '甚': 'what, why', '麼': 'particle', '長': 'long, grow',
-            '特': 'special, particular', '點': 'point, dot',
-            # Add more characters for better coverage
-            '我': 'I, me', '在': 'at, in', '整': 'whole, complete', '個': 'individual, piece',
-            '傳': 'transmit, pass on', '過': 'pass, go through', '程': 'process, journey',
-            '中': 'middle, center', '本': 'root, origin', '著': 'particle, aspect',
-            '對': 'toward, correct', '社': 'society', '會': 'meeting, society',
-            '負': 'bear, carry', '責': 'responsibility', '學': 'learn, study',
-            '員': 'member, person', '收': 'receive, collect', '到': 'arrive, reach',
-            '的': 'possessive particle', '效': 'effect, result', '果': 'fruit, result',
-            '影': 'shadow, image', '響': 'sound, influence', '也': 'also, too',
-            '比': 'compare, than', '較': 'compare, relatively',
-            # Add more common characters that were showing as "Unknown"
-            '能': 'able, capable', '夠': 'enough, sufficient', '直': 'straight, direct',
-            '接': 'connect, receive', '聽': 'hear, listen', '到': 'arrive, reach',
-            '覺': 'feel, perceive', '得': 'get, obtain', '很': 'very, quite',
-            '奇': 'strange, odd', '怪': 'strange, weird', '這': 'this', '個': 'classifier',
-            '師': 'teacher, master', '父': 'father', '怎': 'how', '會': 'can, able',
-            '知': 'know', '道': 'way, path', '呢': 'particle', '因': 'because',
-            '國': 'country', '全': 'complete, whole', '形': 'form, shape', '勢': 'power, situation',
-            '都': 'all, both', '現': 'now, present', '代': 'generation, era', '科': 'science',
-            '醫': 'medicine, doctor', '所': 'place, location', '能': 'able, can',
-            '解': 'solve, explain', '釋': 'explain, interpret', '但': 'but, however',
-            '它': 'it', '超': 'exceed, surpass', '越': 'surpass, cross', '了': 'particle',
-            '常': 'normal, usual', '理': 'principle, reason', '範': 'scope, range',
-            '圍': 'surround, range', '用': 'use, employ', '普': 'universal, general',
-            '通': 'through, common', '根': 'root, basis'
-        }
-        return meaning_dict.get(char, 'Unknown')
+        """Get English meaning for a character using dictionary service"""
+        # Use the dictionary service to get the full definition
+        translation = dictionary_service.get_translation(char)
+        if translation:
+            # Return the full definition with all numbered meanings
+            return translation
+        
+        return 'Unknown'
     
     def _get_stroke_count(self, char: str) -> int:
         """Get stroke count for a character"""

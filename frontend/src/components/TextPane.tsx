@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { TextData } from '../types/index';
+import { TextData, ScriptType } from '../types/index';
+import { detectScriptType } from '../services/api';
 
 interface TextPaneProps {
   textData: TextData | null;
@@ -17,14 +18,65 @@ const TextPane: React.FC<TextPaneProps> = ({
   onLoadText,
 }) => {
   const [inputText, setInputText] = useState<string>('');
-  const [showInput, setShowInput] = useState<boolean>(false);
+  const [showInput, setShowInput] = useState<boolean>(true);
+  const [scriptType, setScriptType] = useState<ScriptType>('auto');
+  const [detectedType, setDetectedType] = useState<ScriptType | null>(null);
 
-  const handleLoadText = () => {
+  const handleLoadText = async () => {
     if (inputText.trim()) {
-      onLoadText(inputText.trim());
+      const text = inputText.trim();
+      
+      // Auto-detect script type if set to auto
+      if (scriptType === 'auto') {
+        try {
+          const detected = await detectScriptType(text);
+          setDetectedType(detected);
+          console.log(`Auto-detected script type: ${detected}`);
+        } catch (error) {
+          console.error('Failed to detect script type:', error);
+          setDetectedType('traditional'); // Default to traditional
+        }
+      } else {
+        setDetectedType(scriptType);
+      }
+      
+      onLoadText(text);
       setInputText('');
       setShowInput(false);
     }
+  };
+
+  const handlePasteNewText = () => {
+    setInputText('');
+    setShowInput(true);
+    setScriptType('auto');
+    setDetectedType(null);
+  };
+
+  const renderTextWithHighlight = () => {
+    if (!textData || !selectedSentence) {
+      return textData?.content;
+    }
+
+    const content = textData.content;
+    const sentenceIndex = content.indexOf(selectedSentence);
+    
+    if (sentenceIndex === -1) {
+      // Sentence not found in content, just return content as-is
+      return content;
+    }
+
+    const beforeText = content.substring(0, sentenceIndex);
+    const highlightedText = selectedSentence;
+    const afterText = content.substring(sentenceIndex + selectedSentence.length);
+
+    return (
+      <>
+        {beforeText}
+        <span className="bg-yellow-200 border-b-2 border-yellow-500">{highlightedText}</span>
+        {afterText}
+      </>
+    );
   };
 
   const handleLoadSample = () => {
@@ -224,22 +276,45 @@ const TextPane: React.FC<TextPaneProps> = ({
       {/* Header with controls */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800 chinese-text">
+          <h2 className="text-xl font-semibold text-gray-800">
             {textData?.title || 'Chinese Learning App'}
-          </h1>
-          <div className="flex space-x-2">
+          </h2>
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowInput(!showInput)}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              {showInput ? 'Cancel' : 'Load Text'}
+              {showInput ? 'Cancel' : 'Process Text'}
             </button>
+            
+            {/* Script type selector */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-gray-600">Script:</label>
+              <select
+                value={scriptType}
+                onChange={(e) => setScriptType(e.target.value as ScriptType)}
+                className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="auto">Auto-detect</option>
+                <option value="traditional">Traditional</option>
+                <option value="simplified">Simplified</option>
+              </select>
+              {detectedType && detectedType !== 'auto' && (
+                <span className="text-xs text-gray-500">
+                  (Detected: {detectedType})
+                </span>
+              )}
+            </div>
+            
+            {/* Load Sample button - commented out but kept for testing */}
+            {/* 
             <button
               onClick={handleLoadSample}
               className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
             >
               Load Sample
             </button>
+            */}
           </div>
         </div>
 
@@ -266,7 +341,7 @@ const TextPane: React.FC<TextPaneProps> = ({
                 disabled={!inputText.trim()}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
-                Load Text
+                Process Text
               </button>
             </div>
           </div>
@@ -276,8 +351,16 @@ const TextPane: React.FC<TextPaneProps> = ({
       {/* Text content */}
       {textData ? (
         <div>
-          <div className="mb-4 p-2 bg-gray-50 rounded text-sm text-gray-600">
-            💡 <strong>Tip:</strong> Double-click any Chinese text to analyze the entire sentence
+          <div className="mb-4 flex items-center justify-between">
+            <div className="p-2 bg-gray-50 rounded text-sm text-gray-600 flex-1">
+              💡 <strong>Tip:</strong> Double-click any Chinese text to analyze the entire sentence
+            </div>
+            <button
+              onClick={handlePasteNewText}
+              className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors whitespace-nowrap"
+            >
+              Paste New Text
+            </button>
           </div>
           
           <div 
@@ -285,22 +368,7 @@ const TextPane: React.FC<TextPaneProps> = ({
             onMouseUp={handleTextSelection}
             onDoubleClick={handleDoubleClick}
           >
-            {textData.content}
-            
-            {/* Show selected text for analysis */}
-            {selectedSentence && (
-              <div className="mt-6 p-3 bg-green-50 border-l-4 border-green-500 rounded-r">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-700">Selected for analysis:</span>
-                  <span className="text-sm text-gray-500">
-                    {selectedSentence.length} characters
-                  </span>
-                </div>
-                <div className="text-green-800 font-medium chinese-text text-lg">
-                  "{selectedSentence}"
-                </div>
-              </div>
-            )}
+            {renderTextWithHighlight()}
           </div>
         </div>
       ) : (
@@ -311,22 +379,14 @@ const TextPane: React.FC<TextPaneProps> = ({
             </svg>
           </div>
           <h3 className="text-lg font-medium mb-2">No text loaded</h3>
-          <p className="mb-4">Click "Load Text" to paste Chinese text for analysis</p>
+          <p className="mb-4">Click "Process Text" to paste Chinese text for analysis</p>
           <button
             onClick={() => setShowInput(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
-            Load Text
-          </button>
-        </div>
-      )}
-
-      {/* Selected sentence display */}
-      {selectedSentence && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-          <h3 className="font-semibold text-gray-700 mb-2">Selected:</h3>
-          <p className="chinese-text text-lg">{selectedSentence}</p>
-        </div>
+          Process Text
+        </button>
+      </div>
       )}
     </div>
   );

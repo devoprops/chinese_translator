@@ -5,3 +5,8 @@ pypinyin==0.49.0
 requests==2.31.0
 gunicorn==21.2.0
 python-dotenv==1.0.0
+
+# Note: pandas is not needed at runtime, only for dictionary processing
+# If you need to regenerate the dictionary, install it separately:
+#   pip install pandas==2.0.3
+# (Currently pandas 2.0.3 doesn't compile on Python 3.13, use Python 3.11 for dict processing)

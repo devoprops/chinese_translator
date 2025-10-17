@@ -36,5 +36,15 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+export type ScriptType = 'auto' | 'traditional' | 'simplified' | 'mixed';
+
+export interface DictionaryStats {
+  total_words: number;
+  total_entries: number;
+  words_with_multiple_pinyin: number;
+  simplified_mappings: number;
+  traditional_mappings: number;
+}
+
 
 

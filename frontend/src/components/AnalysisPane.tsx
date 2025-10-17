@@ -11,6 +11,50 @@ interface CharacterAnalysisSectionProps {
   analysisData: AnalysisData;
 }
 
+// Component to display expandable definitions
+const ExpandableDefinition: React.FC<{ text: string; maxDefinitions?: number; className?: string }> = ({ 
+  text, 
+  maxDefinitions = 5,
+  className = ''
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Split definitions by semicolon and number pattern
+  const splitDefinitions = (definition: string): string[] => {
+    // Split by semicolon, but keep the numbers with their definitions
+    return definition.split(';').map(d => d.trim()).filter(d => d.length > 0);
+  };
+
+  const definitions = splitDefinitions(text);
+  const hasMore = definitions.length > maxDefinitions;
+  const displayedDefinitions = isExpanded ? definitions : definitions.slice(0, maxDefinitions);
+  const displayText = displayedDefinitions.join('; ');
+
+  if (!hasMore) {
+    return <div className={className}>{text}</div>;
+  }
+
+  return (
+    <div className={className}>
+      {displayText}
+      {hasMore && (
+        <>
+          {!isExpanded && '; '}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+            className="text-blue-500 hover:text-blue-700 font-semibold ml-1 cursor-pointer"
+          >
+            {isExpanded ? '« less' : '...more »'}
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
 const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ analysisData }) => {
   const [translations, setTranslations] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
@@ -118,7 +162,7 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-3 text-gray-800">Character Analysis</h2>
+      <h2 className="text-xl font-semibold mb-3 text-gray-800">Phrase and Character Analysis</h2>
       <div className="p-4 bg-gray-50 rounded-lg">
         <div className="space-y-4">
           {loading ? (
@@ -135,7 +179,7 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
             return (
               <div key={groupIndex} className="flex gap-4 overflow-x-auto">
                 {/* Word Group */}
-                <div className="flex flex-col items-center p-3 bg-blue-50 border border-blue-200 rounded-lg min-w-[120px] flex-shrink-0">
+                <div className="flex flex-col items-center p-3 bg-blue-50 border border-blue-200 rounded-lg min-w-[180px] flex-shrink-0">
                   {/* Row 1: Characters */}
                   <div className="chinese-character mb-1">
                     {word}
@@ -145,14 +189,16 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
                     {pinyin}
                   </div>
                   {/* Row 3: Translation */}
-                  <div className="text-xs text-blue-600 text-center max-w-[120px] break-words">
-                    {translation}
-                  </div>
+                  <ExpandableDefinition 
+                    text={translation} 
+                    maxDefinitions={5}
+                    className="text-xs text-blue-600 text-center max-w-[180px] break-words"
+                  />
                 </div>
 
                 {/* Individual Characters for this group */}
                 {wordGroup.map((char, charIndex) => (
-                  <div key={`${groupIndex}-${charIndex}`} className="flex flex-col items-center p-3 bg-green-50 border border-green-200 rounded-lg min-w-[100px] flex-shrink-0">
+                  <div key={`${groupIndex}-${charIndex}`} className="flex flex-col items-center p-3 bg-green-50 border border-green-200 rounded-lg min-w-[150px] flex-shrink-0">
                     {/* Row 1: Character */}
                     <div className="chinese-character mb-1">
                       {char.character}
@@ -162,9 +208,11 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
                       {char.pinyin}
                     </div>
                     {/* Row 3: Meaning */}
-                    <div className="text-xs text-green-600 text-center max-w-[100px] break-words">
-                      {translations[char.character] || char.meaning}
-                    </div>
+                    <ExpandableDefinition 
+                      text={translations[char.character] || char.meaning}
+                      maxDefinitions={5}
+                      className="text-xs text-green-600 text-center max-w-[150px] break-words"
+                    />
                   </div>
                 ))}
               </div>
@@ -217,12 +265,10 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Original Sentence */}
-      <div>
-        <h2 className="text-xl font-semibold mb-3 text-gray-800">Original Sentence</h2>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="chinese-text text-lg leading-relaxed">{analysisData.original}</p>
-        </div>
+      {/* Current Sentence */}
+      <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+        <h3 className="font-semibold text-gray-700 mb-2">Current Sentence:</h3>
+        <p className="chinese-text text-lg">{analysisData.original}</p>
       </div>
 
       {/* Translation */}
@@ -256,24 +302,19 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
                   {/* Row 1: Chinese characters in tight horizontal layout */}
                   <div className="flex gap-1 mb-1">
                     {wordGroup.map((char, charIndex) => (
-                      <div key={charIndex} className="chinese-character text-3xl">
+                      <div key={charIndex} className="chinese-character text-5xl">
                         {char.character}
                       </div>
                     ))}
                   </div>
                   
                   {/* Row 2: Pinyin in tight horizontal layout */}
-                  <div className="flex gap-1 mb-2">
+                  <div className="flex gap-1">
                     {wordGroup.map((char, charIndex) => (
                       <div key={charIndex} className="pinyin-text text-sm text-gray-600 text-center min-w-[2rem]">
                         {char.pinyin}
                       </div>
                     ))}
-                  </div>
-                  
-                  {/* Row 3: Complete word (grouped characters) */}
-                  <div className="text-xs text-blue-500 opacity-70 text-center">
-                    {wordGroup[0]?.word || wordGroup.map(c => c.character).join('')}
                   </div>
                 </div>
               ));
@@ -282,7 +323,7 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
         </div>
       </div>
 
-      {/* Character Analysis - Two Pane Layout */}
+      {/* Phrase and Character Analysis - Two Pane Layout */}
       <CharacterAnalysisSection analysisData={analysisData} />
     </div>
   );
