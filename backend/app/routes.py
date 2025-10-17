@@ -9,6 +9,11 @@ text_service = TextService()
 translation_service = TranslationService()
 pinyin_service = PinyinService()
 
+@api_bp.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Railway"""
+    return jsonify({'status': 'healthy', 'message': 'Backend is running'}), 200
+
 @api_bp.route('/text/<text_id>', methods=['GET'])
 def get_text(text_id):
     """Get text content by ID"""
