@@ -82,7 +82,7 @@ function App() {
   };
 
   const handleNextSentence = () => {
-    if (textData && currentSentenceIndex < textData.sentences.length - 1) {
+    if (textData && currentSentenceIndex >= 0 && currentSentenceIndex < textData.sentences.length - 1) {
       const nextIndex = currentSentenceIndex + 1;
       const nextSentence = textData.sentences[nextIndex];
       handleSentenceSelect(nextSentence, nextIndex);
