@@ -311,15 +311,23 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex flex-wrap gap-6">
             {(() => {
-              // Group characters by words
+              // Group characters by words, FILTERING OUT PUNCTUATION (same as Analysis section)
               const wordGroups: Array<typeof analysisData.character_analysis> = [];
               let currentGroup: typeof analysisData.character_analysis = [];
               
               analysisData.character_analysis.forEach((char, index) => {
-                currentGroup.push(char);
+                // Skip punctuation characters (same regex as Analysis section)
+                const isPunctuation = /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character);
+                
+                if (!isPunctuation) {
+                  currentGroup.push(char);
+                }
+                
                 if (char.is_word_end || index === analysisData.character_analysis.length - 1) {
-                  wordGroups.push([...currentGroup]);
-                  currentGroup = [];
+                  if (currentGroup.length > 0) {
+                    wordGroups.push([...currentGroup]);
+                    currentGroup = [];
+                  }
                 }
               });
 
