@@ -37,12 +37,16 @@ function App() {
     // Auto-start with the first sentence if available
     if (sentences.length > 0) {
       const firstSentence = sentences[0];
+      // Clean the sentence: remove extra whitespace and newlines
+      const cleanSentence = firstSentence.trim().replace(/\s+/g, ' ');
+      
       setSelectedSentence(firstSentence);
       setCurrentSentenceIndex(0);
       setLoading(true);
       
       try {
-        const analysis = await analyzeText(firstSentence);
+        // Send cleaned sentence to backend
+        const analysis = await analyzeText(cleanSentence);
         setAnalysisData(analysis);
       } catch (error) {
         console.error('Failed to analyze first sentence:', error);
@@ -58,12 +62,16 @@ function App() {
   };
 
   const handleSentenceSelect = async (sentence: string, index: number) => {
-    setSelectedSentence(sentence);
+    // Clean the sentence: remove extra whitespace and newlines
+    const cleanSentence = sentence.trim().replace(/\s+/g, ' ');
+    
+    setSelectedSentence(sentence); // Keep original for display
     setCurrentSentenceIndex(index);
     setLoading(true);
 
     try {
-      const analysis = await analyzeText(sentence);
+      // Send cleaned sentence to backend
+      const analysis = await analyzeText(cleanSentence);
       setAnalysisData(analysis);
     } catch (error) {
       console.error('Failed to analyze text:', error);
