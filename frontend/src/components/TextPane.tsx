@@ -191,24 +191,15 @@ const TextPane: React.FC<TextPaneProps> = ({
   };
 
   const findSentenceStart = (text: string, position: number): number => {
-    // Look backward for sentence endings first
+    // Look backward for sentence boundaries (punctuation OR newlines)
     for (let i = position; i >= 0; i--) {
+      // Check for punctuation marks
       if (text[i] === '。' || text[i] === '！' || text[i] === '？') {
-        return i + 1; // Start after the period
+        return i + 1; // Start after the punctuation
       }
-    }
-    
-    // If no period found, look for paragraph breaks (more generous)
-    for (let i = position; i >= 0; i--) {
-      if (text.substring(i, i + 2) === '\n\n') {
-        return i + 2;
-      }
-    }
-    
-    // If no double newline, look for single newline
-    for (let i = position; i >= 0; i--) {
+      // Check for newline (paragraph/heading boundary)
       if (text[i] === '\n') {
-        return i + 1;
+        return i + 1; // Start after the newline
       }
     }
     
@@ -216,24 +207,15 @@ const TextPane: React.FC<TextPaneProps> = ({
   };
 
   const findSentenceEnd = (text: string, position: number): number => {
-    // Look forward for sentence endings first
+    // Look forward for sentence boundaries (punctuation OR newlines)
     for (let i = position; i < text.length; i++) {
+      // Check for punctuation marks
       if (text[i] === '。' || text[i] === '！' || text[i] === '？') {
-        return i + 1; // Include the period
+        return i + 1; // Include the punctuation
       }
-    }
-    
-    // If no period found, look for paragraph breaks (more generous)
-    for (let i = position; i < text.length; i++) {
-      if (text.substring(i, i + 2) === '\n\n') {
-        return i;
-      }
-    }
-    
-    // If no double newline, look for single newline
-    for (let i = position; i < text.length; i++) {
+      // Check for newline (paragraph/heading boundary) - stop here for headings
       if (text[i] === '\n') {
-        return i;
+        return i; // Don't include the newline in the sentence
       }
     }
     
