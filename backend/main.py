@@ -36,6 +36,17 @@ def create_app():
             'environment': os.getenv('FLASK_ENV', 'development')
         }
     
+    # Add CORS headers to every response (backup to flask-cors)
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        if origin in origins_list:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
+    
     return app
 
 # Create the app instance for gunicorn
