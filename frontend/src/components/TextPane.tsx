@@ -104,7 +104,9 @@ const TextPane: React.FC<TextPaneProps> = ({
       const selectedText = selection.toString().trim();
       // Only process if it contains Chinese characters
       if (/[\u4e00-\u9fff]/.test(selectedText)) {
-        onSentenceSelect(selectedText, -1); // Use -1 to indicate user selection
+        // Try to find the index of this sentence in the sentences array
+        const index = textData?.sentences.findIndex(s => s.trim() === selectedText.trim()) ?? -1;
+        onSentenceSelect(selectedText, index); // Use found index or -1 if not found
       }
     }
   };
@@ -150,9 +152,12 @@ const TextPane: React.FC<TextPaneProps> = ({
           sel.removeAllRanges();
         }
         
+        // Try to find the index of this sentence in the sentences array
+        const index = textData.sentences.findIndex(s => s.trim() === sentence.trim());
+        
         // Manually select the sentence text
         selectTextInDOM(sentence);
-        onSentenceSelect(sentence, -1);
+        onSentenceSelect(sentence, index); // Use found index or -1 if not found
       }
     }, 0); // Run on next tick
   };

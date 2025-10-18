@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TextPane from './components/TextPane';
 import AnalysisPane from './components/AnalysisPane';
 import NavigationBar from './components/NavigationBar';
@@ -96,6 +96,28 @@ function App() {
       handleSentenceSelect(prevSentence, prevIndex);
     }
   };
+
+  // Keyboard navigation: Left/Right arrow keys
+  // Uses the same handleNextSentence/handlePreviousSentence functions as the buttons
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle arrow keys if not typing in an input/textarea
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        handlePreviousSentence(); // Same function as Previous button
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        handleNextSentence(); // Same function as Next button
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePreviousSentence, handleNextSentence]); // Re-bind when handler functions change
 
   return (
     <div className="h-screen flex flex-col">
