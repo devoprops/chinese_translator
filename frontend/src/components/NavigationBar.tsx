@@ -38,7 +38,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             
             <button
               onClick={onNext}
-              disabled={currentIndex >= totalSentences - 1}
+              disabled={currentIndex < 0 || currentIndex >= totalSentences - 1}
               className="nav-button"
             >
               Next Sentence →
