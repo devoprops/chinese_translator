@@ -13,7 +13,7 @@ def create_app():
     app = Flask(__name__)
     
     # Get CORS origins from environment or use defaults
-    allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000,https://devocosm.com')
+    allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000,https://devocosm.com,https://devocosm.pages.dev')
     origins_list = [origin.strip() for origin in allowed_origins.split(',')]
     
     # Enable CORS for frontend with credentials support
