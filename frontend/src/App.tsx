@@ -13,11 +13,17 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const processText = async (rawText: string) => {
-    // Split into sentences while preserving paragraph structure
+    // Split into sentences by:
+    // 1. Punctuation marks (。！？)
+    // 2. Line breaks (for headings and paragraphs)
     const sentences = rawText
-      .split(/(?<=[。！？])/)
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .split(/(?<=[。！？])|(?:\n\s*\n)/)  // Split on punctuation OR double line breaks
+      .flatMap(segment => {
+        // Further split segments by single line breaks if they don't end with punctuation
+        return segment.split(/\n+/)
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+      });
 
     const textData: TextData = {
       id: 'user_input',
