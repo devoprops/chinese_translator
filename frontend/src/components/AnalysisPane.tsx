@@ -60,6 +60,19 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
   const [loading, setLoading] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
 
+  // Handle double-click to scroll to pinyin section
+  const handleDoubleClickToScroll = (groupIndex: number) => {
+    const pinyinElement = document.getElementById(`pinyin-group-${groupIndex}`);
+    if (pinyinElement) {
+      pinyinElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Add a brief highlight effect
+      pinyinElement.classList.add('highlight-flash');
+      setTimeout(() => {
+        pinyinElement.classList.remove('highlight-flash');
+      }, 1500);
+    }
+  };
+
   // Group characters by words
   const wordGroups: Array<typeof analysisData.character_analysis> = [];
   let currentGroup: typeof analysisData.character_analysis = [];
@@ -177,9 +190,17 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
               const translation = translations[word] || wordGroup[0]?.meaning || 'Unknown';
             
             return (
-              <div key={groupIndex} className="flex gap-4 overflow-x-auto">
+              <div 
+                key={groupIndex} 
+                id={`analysis-group-${groupIndex}`}
+                className="flex gap-4 overflow-x-auto"
+              >
                 {/* Word Group */}
-                <div className="flex flex-col items-center p-3 bg-blue-50 border border-blue-200 rounded-lg min-w-[180px] flex-shrink-0">
+                <div 
+                  className="flex flex-col items-center p-3 bg-blue-50 border border-blue-200 rounded-lg min-w-[180px] flex-shrink-0 cursor-pointer hover:shadow-md transition-shadow"
+                  onDoubleClick={() => handleDoubleClickToScroll(groupIndex)}
+                  title="Double-click to view in Chinese Text with Pinyin section"
+                >
                   {/* Row 1: Characters */}
                   <div className="chinese-character mb-1">
                     {word}
@@ -198,7 +219,12 @@ const CharacterAnalysisSection: React.FC<CharacterAnalysisSectionProps> = ({ ana
 
                 {/* Individual Characters for this group */}
                 {wordGroup.map((char, charIndex) => (
-                  <div key={`${groupIndex}-${charIndex}`} className="flex flex-col items-center p-3 bg-green-50 border border-green-200 rounded-lg min-w-[150px] flex-shrink-0">
+                  <div 
+                    key={`${groupIndex}-${charIndex}`} 
+                    className="flex flex-col items-center p-3 bg-green-50 border border-green-200 rounded-lg min-w-[150px] flex-shrink-0 cursor-pointer hover:shadow-md transition-shadow"
+                    onDoubleClick={() => handleDoubleClickToScroll(groupIndex)}
+                    title="Double-click to view in Chinese Text with Pinyin section"
+                  >
                     {/* Row 1: Character */}
                     <div className="chinese-character mb-1">
                       {char.character}
@@ -296,9 +322,28 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
                   currentGroup = [];
                 }
               });
+
+              // Handle double-click to scroll to analysis section
+              const handleDoubleClickToAnalysis = (groupIndex: number) => {
+                const analysisElement = document.getElementById(`analysis-group-${groupIndex}`);
+                if (analysisElement) {
+                  analysisElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Add a brief highlight effect
+                  analysisElement.classList.add('highlight-flash');
+                  setTimeout(() => {
+                    analysisElement.classList.remove('highlight-flash');
+                  }, 1500);
+                }
+              };
               
               return wordGroups.map((wordGroup, groupIndex) => (
-                <div key={groupIndex} className="flex flex-col items-center">
+                <div 
+                  key={groupIndex} 
+                  id={`pinyin-group-${groupIndex}`}
+                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onDoubleClick={() => handleDoubleClickToAnalysis(groupIndex)}
+                  title="Double-click to view detailed analysis"
+                >
                   {/* Row 1: Chinese characters in tight horizontal layout */}
                   <div className="flex gap-1 mb-1">
                     {wordGroup.map((char, charIndex) => (
