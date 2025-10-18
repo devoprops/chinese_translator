@@ -16,12 +16,14 @@ def create_app():
     allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000,https://devocosm.com,https://devocosm.pages.dev')
     origins_list = [origin.strip() for origin in allowed_origins.split(',')]
     
-    # Enable CORS for frontend with credentials support
+    # Enable CORS for all routes with explicit configuration
     CORS(app, 
-         origins=origins_list,
-         supports_credentials=True,
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'OPTIONS'])
+         resources={r"/*": {
+             "origins": origins_list,
+             "methods": ["GET", "POST", "OPTIONS"],
+             "allow_headers": ["Content-Type", "Authorization"],
+             "supports_credentials": True
+         }})
     
     # Register blueprints
     app.register_blueprint(api_bp, url_prefix='/api')
