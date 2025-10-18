@@ -311,66 +311,84 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex flex-wrap gap-6">
             {(() => {
-              // Group characters by words, FILTERING OUT PUNCTUATION (same as Analysis section)
-              const wordGroups: Array<typeof analysisData.character_analysis> = [];
+              // Group characters by words, INCLUDING punctuation for display
+              const allWordGroups: Array<typeof analysisData.character_analysis> = [];
               let currentGroup: typeof analysisData.character_analysis = [];
               
               analysisData.character_analysis.forEach((char, index) => {
-                // Skip punctuation characters (same regex as Analysis section)
-                const isPunctuation = /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character);
-                
-                if (!isPunctuation) {
-                  currentGroup.push(char);
-                }
-                
+                currentGroup.push(char);
                 if (char.is_word_end || index === analysisData.character_analysis.length - 1) {
-                  if (currentGroup.length > 0) {
-                    wordGroups.push([...currentGroup]);
-                    currentGroup = [];
-                  }
+                  allWordGroups.push([...currentGroup]);
+                  currentGroup = [];
+                }
+              });
+
+              // Create index mapping: only count non-punctuation groups for navigation
+              let nonPunctuationIndex = 0;
+              const groupToAnalysisIndex = new Map<number, number>();
+              
+              allWordGroups.forEach((wordGroup, groupIndex) => {
+                const isPunctuationGroup = wordGroup.every(char => 
+                  /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character)
+                );
+                
+                if (!isPunctuationGroup) {
+                  groupToAnalysisIndex.set(groupIndex, nonPunctuationIndex);
+                  nonPunctuationIndex++;
                 }
               });
 
               // Handle double-click to scroll to analysis section
               const handleDoubleClickToAnalysis = (groupIndex: number) => {
-                const analysisElement = document.getElementById(`analysis-group-${groupIndex}`);
-                if (analysisElement) {
-                  analysisElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  // Add a brief highlight effect
-                  analysisElement.classList.add('highlight-flash');
-                  setTimeout(() => {
-                    analysisElement.classList.remove('highlight-flash');
-                  }, 1500);
+                const analysisIndex = groupToAnalysisIndex.get(groupIndex);
+                if (analysisIndex !== undefined) {
+                  const analysisElement = document.getElementById(`analysis-group-${analysisIndex}`);
+                  if (analysisElement) {
+                    analysisElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a brief highlight effect
+                    analysisElement.classList.add('highlight-flash');
+                    setTimeout(() => {
+                      analysisElement.classList.remove('highlight-flash');
+                    }, 1500);
+                  }
                 }
               };
               
-              return wordGroups.map((wordGroup, groupIndex) => (
-                <div 
-                  key={groupIndex} 
-                  id={`pinyin-group-${groupIndex}`}
-                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-                  onDoubleClick={() => handleDoubleClickToAnalysis(groupIndex)}
-                  title="Double-click to view detailed analysis"
-                >
-                  {/* Row 1: Chinese characters in tight horizontal layout */}
-                  <div className="flex gap-1 mb-1">
-                    {wordGroup.map((char, charIndex) => (
-                      <div key={charIndex} className="chinese-character text-5xl">
-                        {char.character}
-                      </div>
-                    ))}
+              return allWordGroups.map((wordGroup, groupIndex) => {
+                const isPunctuationGroup = wordGroup.every(char => 
+                  /[、，。！？；：""''（）【】《》〈〉「」『』\s]/.test(char.character)
+                );
+                const analysisIndex = groupToAnalysisIndex.get(groupIndex);
+                const hasDoubleClickHandler = !isPunctuationGroup;
+                
+                return (
+                  <div 
+                    key={groupIndex} 
+                    id={hasDoubleClickHandler ? `pinyin-group-${analysisIndex}` : undefined}
+                    className={`flex flex-col items-center ${hasDoubleClickHandler ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                    onDoubleClick={hasDoubleClickHandler ? () => handleDoubleClickToAnalysis(groupIndex) : undefined}
+                    title={hasDoubleClickHandler ? "Double-click to view detailed analysis" : undefined}
+                  >
+                    {/* Row 1: Chinese characters in tight horizontal layout */}
+                    <div className="flex gap-1 mb-1">
+                      {wordGroup.map((char, charIndex) => (
+                        <div key={charIndex} className="chinese-character text-5xl">
+                          {char.character}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Row 2: Pinyin in tight horizontal layout */}
+                    <div className="flex gap-1">
+                      {wordGroup.map((char, charIndex) => (
+                        <div key={charIndex} className="pinyin-text text-sm text-gray-600 text-center min-w-[2rem]">
+                          {char.pinyin}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  
-                  {/* Row 2: Pinyin in tight horizontal layout */}
-                  <div className="flex gap-1">
-                    {wordGroup.map((char, charIndex) => (
-                      <div key={charIndex} className="pinyin-text text-sm text-gray-600 text-center min-w-[2rem]">
-                        {char.pinyin}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ));
+                );
+              });
             })()}
           </div>
         </div>
