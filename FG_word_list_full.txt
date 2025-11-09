@@ -205,7 +205,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 年	年	年	53.1357	Nián	1. surname Nian
 年	年	年	53.1357	nián	1. year; 2. CL:個|个[gè]
 年	年	秊	53.1357	nián	1. grain; 2. harvest (old); 3. variant of 年[nián]
-佛教	佛教	佛教	53.2377	Fó jiào	1. Buddhism
+佛教	佛教	佛教	53.2377	fó jiào	1. Buddhism
 不了	不了	不了	53.3385	bù le	1. no thanks (used to politely but informally decline)
 不了	不了	不了	53.3385	bù liǎo	1. unable to; 2. without end
 道	道	道	53.4392	dào	1. road; 2. path; 3. CL:條|条[tiáo],股[gǔ]; 4. principle; 5. truth; 6. morality; 7. reason; 8. skill; 9. method; 10. Dao (of Daoism); 11. to say; 12. to speak; 13. to talk; 14. classifier for long thin things (rivers, cracks etc), barriers (walls, doors etc), questions (in an exam etc), commands, courses in a meal, steps in a process; 15. (old) circuit (administrative division)
@@ -214,7 +214,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 呢	呢	呢	53.6395	ne	1. particle indicating that a previously asked question is to be applied to the preceding word ("What about ...?", "And ...?"); 2. particle for inquiring about location ("Where is ...?"); 3. particle signaling a pause, to emphasize the preceding words and allow the listener time to take them on board ("ok?", "are you with me?"); 4. (at the end of a declarative sentence) particle indicating continuation of a state or action; 5. particle indicating strong affirmation
 呢	呢	呢	53.6395	ní	1. woolen material
 生命	生命	生命	53.7384	shēng mìng	1. life (as the characteristic of living beings); 2. living being; 3. creature; 4. CL:個|个[gè],條|条[tiáo]
-佛	佛	佛	53.8373	Fó	1. Buddha; 2. Buddhism
+佛	佛	佛	53.8373	fó	1. Buddha; 2. Buddhism
 佛	佛	彿	53.8373	fú	1. seemingly
 佛	佛	髴	53.8373	fú	1. (female) head ornament; 2. variant of 彿|佛[fú]
 所	所	所	53.9343	suǒ	1. actually; 2. place; 3. classifier for houses, small buildings, institutions etc; 4. that which; 5. particle introducing a relative clause or passive; 6. CL:個|个[gè]
@@ -413,7 +413,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 宗教	宗教	宗教	63.9879	zōng jiào	1. religion
 只是	只是	只是	64.0380	zhǐ shì	1. merely; 2. simply; 3. only; 4. but
 字	字	字	64.0880	zì	1. letter; 2. symbol; 3. character; 4. word; 5. CL:個|个[gè]; 6. courtesy or style name traditionally given to males aged 20 in dynastic China
-佛家	佛家	佛家	64.1381	Fó jiā	1. Buddhism; 2. Buddhist
+佛家	佛家	佛家	64.1381	fó jiā	1. Buddhism; 2. Buddhist
 難	难	難	64.1882	nán	1. difficult (to...); 2. problem; 3. difficulty; 4. difficult; 5. not good
 難	难	難	64.1882	nàn	1. disaster; 2. distress; 3. to scold
 不同	不同	不同	64.2382	bù tóng	1. different; 2. distinct; 3. not the same; 4. not alike
@@ -1266,7 +1266,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 法國	法国	法國	80.6414	Fǎ guó	1. France; 2. French
 債	债	債	80.6545	zhài	1. debt; 2. CL:筆|笔[bǐ]
 來源於	来源于	來源於	80.6677	lái yuán yú	1. to originate in
-佛性	佛性	佛性	80.6808	Fó xìng	1. Buddha nature
+佛性	佛性	佛性	80.6808	fó xìng	1. Buddha nature
 幾千	几千	幾千	80.6940	jǐ qiān	1. several thousand
 魔難	魔难	魔難	80.7071	mó nàn	1. variant of 磨難|磨难[mó nàn]
 些	些	些	80.7203	xiē	1. classifier indicating a small amount or small number greater than 1: some, a few, several
@@ -1995,7 +1995,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 城市	城市	城市	86.8733	chéng shì	1. city; 2. town; 3. CL:座[zuò]
 無為	无为	無為	86.8815	Wú wéi	1. Wuwei county in Chaohu 巢湖[Cháo hú], Anhui
 無為	无为	無為	86.8815	wú wéi	1. the Daoist doctrine of inaction; 2. let things take their own course; 3. laissez-faire
-阿彌陀佛	阿弥陀佛	阿彌陀佛	86.8896	Ē mí tuó Fó	1. Amitabha Buddha; 2. the Buddha of the Western paradise; 3. may the lord Buddha preserve us!; 4. merciful Buddha!
+阿彌陀佛	阿弥陀佛	阿彌陀佛	86.8896	Ē mí tuó fó	1. Amitabha Buddha; 2. the Buddha of the Western paradise; 3. may the lord Buddha preserve us!; 4. merciful Buddha!
 日	日	日	86.8977	Rì	1. abbr. for 日本[Rì běn], Japan
 日	日	日	86.8977	rì	1. sun; 2. day; 3. date, day of the month
 念頭	念头	念頭	86.9059	niàn tou	1. thought; 2. idea; 3. intention
@@ -3375,7 +3375,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 不擇手段	不择手段	不擇手段	93.5002	bù zé shǒu duàn	1. by fair means or foul; 2. by hook or by crook; 3. unscrupulously
 做人	做人	做人	93.5039	zuò rén	1. to conduct oneself; 2. to behave with integrity
 封建	封建	封建	93.5077	fēng jiàn	1. system of enfeoffment; 2. feudalism; 3. feudal; 4. feudalistic
-佛陀	佛陀	佛陀	93.5115	Fó tuó	1. Buddha (a person who has attained Buddhahood, or specifically Siddhartha Gautama)
+佛陀	佛陀	佛陀	93.5115	fó tuó	1. Buddha (a person who has attained Buddhahood, or specifically Siddhartha Gautama)
 譯	译	譯	93.5152	yì	1. to translate; 2. to interpret
 浮圖	浮图	浮圖	93.5190	fú tú	1. Buddha; 2. Buddhist stupa (transliteration of Pali thupo); 3. also written 浮屠
 學費	学费	學費	93.5227	xué fèi	1. tuition fee; 2. tuition; 3. CL:個|个[gè]
@@ -3978,7 +3978,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 接收	接收	接收	95.4248	jiē shōu	1. reception (of transmitted signal); 2. to receive; 3. to accept; 4. to admit; 5. to take over (e.g. a factory); 6. to expropriate
 接著	接着	接著	95.4279	jiē zhe	1. to catch and hold on; 2. to continue; 3. to go on to do sth; 4. to follow; 5. to carry on; 6. then; 7. after that; 8. subsequently; 9. to proceed; 10. to ensue; 11. in turn; 12. in one's turn
 法力	法力	法力	95.4310	fǎ lì	1. magic power
-佛光	佛光	佛光	95.4342	Fó guāng	1. Buddha's teachings; 2. aura (around the head of Buddha)
+佛光	佛光	佛光	95.4342	fó guāng	1. Buddha's teachings; 2. aura (around the head of Buddha)
 陣痛	阵痛	陣痛	95.4373	zhèn tòng	1. labor pains
 榜樣	榜样	榜樣	95.4404	bǎng yàng	1. example; 2. model; 3. CL:個|个[gè]
 斷	断	斷	95.4436	duàn	1. to break; 2. to snap; 3. to cut off; 4. to give up or abstain from sth; 5. to judge; 6. (usu. used in the negative) absolutely; 7. definitely; 8. decidedly
@@ -4809,7 +4809,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 天殺的	天杀的	天殺的	97.4808	tiān shā de	1. Goddam!; 2. goddamn; 3. wretched
 載體	载体	載體	97.4827	zài tǐ	1. carrier (chemistry); 2. vector (epidemiology); 3. vehicle or medium
 大限	大限	大限	97.4846	dà xiàn	1. the limit; 2. maximum; 3. one's allocated lifespan
-拜佛	拜佛	拜佛	97.4864	bài Fó	1. to worship Buddha
+拜佛	拜佛	拜佛	97.4864	bài fó	1. to worship Buddha
 念叨	念叨	念叨	97.4883	niàn dao	1. to talk about often; 2. to reminisce about; 3. to keep repeating; 4. to keep harping on; 5. to discuss
 一念之差	一念之差	一念之差	97.4902	yī niàn zhī chā	1. momentary slip; 2. false step; 3. ill-considered action
 開快車	开快车	開快車	97.4921	kāi kuài chē	1. an express train sets off; 2. fig. to work in haste; 3. to rush
@@ -5402,7 +5402,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 假話	假话	假話	98.5924	jiǎ huà	1. a lie; 2. untrue statement; 3. misstatement
 筆畫	笔画	筆畫	98.5943	bǐ huà	1. strokes of a Chinese character
 二者	二者	二者	98.5961	èr zhě	1. both; 2. both of them; 3. neither
-佛學	佛学	佛學	98.5980	Fó xué	1. Buddhist doctrine; 2. Buddhist studies
+佛學	佛学	佛學	98.5980	fó xué	1. Buddhist doctrine; 2. Buddhist studies
 唐山	唐山	唐山	98.5999	Táng shān	1. Tangshan prefecture level city in Hebei
 震中	震中	震中	98.6018	zhèn zhōng	1. earthquake epicenter
 中年	中年	中年	98.6037	zhōng nián	1. middle age
@@ -5570,7 +5570,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 繫	系	繫	98.8008	xì	1. to connect; 2. to arrest; 3. to worry
 沒法	没法	沒法	98.8021	méi fǎ	1. at a loss; 2. unable to do anything about it; 3. to have no choice
 算是	算是	算是	98.8033	suàn shì	1. considered to be; 2. at last
-佛經	佛经	佛經	98.8046	Fó jīng	1. Buddhist texts; 2. scripture
+佛經	佛经	佛經	98.8046	fó jīng	1. Buddhist texts; 2. scripture
 高就	高就	高就	98.8058	gāo jiù	1. to move to a better job
 改	改	改	98.8071	gǎi	1. to change; 2. to alter; 3. to transform; 4. to correct
 恐懼	恐惧	恐懼	98.8083	kǒng jù	1. to be frightened; 2. fear; 3. dread
@@ -5790,7 +5790,7 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 進一步	进一步	進一步	99.0762	jìn yī bù	1. one step further; 2. to move forward a step; 3. further onwards
 順便	顺便	順便	99.0774	shùn biàn	1. conveniently; 2. in passing; 3. without much extra effort
 跪	跪	跪	99.0787	guì	1. to kneel
-燒香拜佛	烧香拜佛	燒香拜佛	99.0800	shāo xiāng bài Fó	1. to burn incense and worship Buddha
+燒香拜佛	烧香拜佛	燒香拜佛	99.0800	shāo xiāng bài fó	1. to burn incense and worship Buddha
 名譽	名誉	名譽	99.0812	míng yù	1. fame; 2. reputation; 3. honor; 4. honorary; 5. emeritus (of retired professor)
 甘心	甘心	甘心	99.0825	gān xīn	1. to be willing to; 2. to resign oneself to
 糊塗	糊涂	糊塗	99.0837	hú tu	1. muddled; 2. silly; 3. confused
@@ -6710,10 +6710,10 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 直截了当	直截了当	直截了當	99.8798	zhí jié liǎo dàng	1. direct and plainspoken (idiom); blunt; 2. straightforward
 衚	胡	衚	99.8805	hú	1. see 衚衕|胡同[hú tòng]
 鬍	胡	鬍	99.8811	hú	1. beard; 2. mustache; 3. whiskers
-瀋陽市	沈阳市	瀋陽市	99.8817	Shěn yáng shì	1. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 2. old names include Fengtian 奉天, Shengjing 盛京 and Mukden
-沈阳市	沈阳市	瀋陽市	99.8823	Shěn yáng shì	1. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 2. old names include Fengtian 奉天, Shengjing 盛京 and Mukden
-西班牙	西班牙	西班牙	99.8830	Xī bān yá	1. Spain
-佛山市	佛山市	佛山市	99.8836	Fó shān shì	1. Foshan prefecture-level city in Guangdong 廣東省|广东省[Guǎng dōng shěng]
+瀋陽市	沈阳市	瀋陽市	6.8817	Shěn yáng shì	1. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 2. old names include Fengtian 奉天, Shengjing 盛京 and Mukden
+沈阳市	沈阳市	瀋陽市	6.8823	Shěn yáng shì	1. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 2. old names include Fengtian 奉天, Shengjing 盛京 and Mukden
+西班牙	西班牙	西班牙	6.8830	Xī bān yá	1. Spain
+佛山市	佛山市	佛山市	6.8836	Fó shān shì	1. Foshan prefecture-level city in Guangdong 廣東省|广东省[Guǎng dōng shěng]
 揹	背	揹	99.8842	bēi	1. variant of 背[bēi]
 天主教	天主教	天主教	99.8848	Tiān zhǔ jiào	1. Catholicism
 栁	柳	栁	99.8855	liǔ	1. old variant of 柳[liǔ]
@@ -6736,14 +6736,14 @@ Word, Simplified, Traditional, Frequency, Pinyin, Definition
 孝感	孝感	孝感	99.8942	Xiào gǎn	1. Xiaogan prefecture level city in Hubei
 蔴	麻	蔴	99.8949	má	1. variant of 麻[má]; 2. hemp
 不对劲	不对劲	不對勁	99.8955	bù duì jìn	1. not in good condition; 2. wrong; 3. fishy
-山西省	山西省	山西省	99.8961	Shān xī shěng	1. Shanxi province (Shansi) in north China between Hebei and Shaanxi, abbr. 晋 capital Taiyuan 太原
+山西省	山西省	山西省	6.8961	Shān xī shěng	1. Shanxi province (Shansi) in north China between Hebei and Shaanxi, abbr. 晋 capital Taiyuan 太原
 后门	后门	後門	99.8967	hòu mén	1. the back door; 2. fig. under the counter (indirect way for influence or pressure); 3. anus
 遛彎	遛弯	遛彎	99.8974	liù wān	1. (dialect) to take a walk; 2. to go for a stroll
 遛弯	遛弯	遛彎	99.8980	liù wān	1. (dialect) to take a walk; 2. to go for a stroll
-粵	粤	粵	99.8986	Yuè	1. Cantonese; 2. short name for Guangdong 廣東|广东[Guǎng dōng]
-粤	粤	粵	99.8992	Yuè	1. Cantonese; 2. short name for Guangdong 廣東|广东[Guǎng dōng]
-廣州	广州	廣州	99.8999	Guǎng zhōu	1. Guangzhou subprovincial city and capital of Guangdong; 2. Canton
-广州	广州	廣州	99.9005	Guǎng zhōu	1. Guangzhou subprovincial city and capital of Guangdong; 2. Canton
+粵	粤	粵	25.8986	Yuè	1. Cantonese; 2. short name for Guangdong 廣東|广东[Guǎng dōng]
+粤	粤	粵	25.8992	Yuè	1. Cantonese; 2. short name for Guangdong 廣東|广东[Guǎng dōng]
+廣州	广州	廣州	90.8999	Guǎng zhōu	1. Guangzhou subprovincial city and capital of Guangdong; 2. Canton
+广州	广州	廣州	90.9005	Guǎng zhōu	1. Guangzhou subprovincial city and capital of Guangdong; 2. Canton
 甘孜藏族自治州	甘孜藏族自治州	甘孜藏族自治州	99.9011	Gān zī Zàng zú zì zhì zhōu	1. Garze or Kandze, Tibetan autonomous prefecture (Tibetan: dkar mdzes bod rigs rang skyong khul), formerly in Kham province of Tibet, present Sichuan
 跤	跤	跤	99.9017	jiāo	1. a tumble; 2. a fall
 糟糠妻	糟糠妻	糟糠妻	99.9024	zāo kāng qī	1. wife who goes through the hardships of poverty with her husband

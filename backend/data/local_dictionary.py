@@ -4296,7 +4296,7 @@ DICTIONARY = {
     ],
     '佛': [
         {
-            'pinyin': 'Fó',
+            'pinyin': 'fó',
             'definition': '''1. Buddha; 2. Buddhism''',
             'frequency': 53.8373,
             'simplified': '佛'
@@ -4312,7 +4312,7 @@ DICTIONARY = {
     ],
     '佛光': [
         {
-            'pinyin': 'Fó guāng',
+            'pinyin': 'fó guāng',
             'definition': '''1. Buddha's teachings; 2. aura (around the head of Buddha)''',
             'frequency': 95.4342,
             'simplified': '佛光'
@@ -4320,7 +4320,7 @@ DICTIONARY = {
     ],
     '佛學': [
         {
-            'pinyin': 'Fó xué',
+            'pinyin': 'fó xué',
             'definition': '''1. Buddhist doctrine; 2. Buddhist studies''',
             'frequency': 98.598,
             'simplified': '佛学'
@@ -4328,7 +4328,7 @@ DICTIONARY = {
     ],
     '佛家': [
         {
-            'pinyin': 'Fó jiā',
+            'pinyin': 'fó jiā',
             'definition': '''1. Buddhism; 2. Buddhist''',
             'frequency': 64.1381,
             'simplified': '佛家'
@@ -4338,13 +4338,13 @@ DICTIONARY = {
         {
             'pinyin': 'Fó shān shì',
             'definition': '''1. Foshan prefecture-level city in Guangdong 廣東省|广东省[Guǎng dōng shěng]''',
-            'frequency': 99.8836,
+            'frequency': 6.8836,
             'simplified': '佛山市'
         },
     ],
     '佛性': [
         {
-            'pinyin': 'Fó xìng',
+            'pinyin': 'fó xìng',
             'definition': '''1. Buddha nature''',
             'frequency': 80.6808,
             'simplified': '佛性'
@@ -4352,7 +4352,7 @@ DICTIONARY = {
     ],
     '佛教': [
         {
-            'pinyin': 'Fó jiào',
+            'pinyin': 'fó jiào',
             'definition': '''1. Buddhism''',
             'frequency': 53.2377,
             'simplified': '佛教'
@@ -4368,7 +4368,7 @@ DICTIONARY = {
     ],
     '佛經': [
         {
-            'pinyin': 'Fó jīng',
+            'pinyin': 'fó jīng',
             'definition': '''1. Buddhist texts; 2. scripture''',
             'frequency': 98.8046,
             'simplified': '佛经'
@@ -4376,7 +4376,7 @@ DICTIONARY = {
     ],
     '佛陀': [
         {
-            'pinyin': 'Fó tuó',
+            'pinyin': 'fó tuó',
             'definition': '''1. Buddha (a person who has attained Buddhahood, or specifically Siddhartha Gautama)''',
             'frequency': 93.5115,
             'simplified': '佛陀'
@@ -16598,7 +16598,7 @@ DICTIONARY = {
         {
             'pinyin': 'Shān xī shěng',
             'definition': '''1. Shanxi province (Shansi) in north China between Hebei and Shaanxi, abbr. 晋 capital Taiyuan 太原''',
-            'frequency': 99.8961,
+            'frequency': 6.8961,
             'simplified': '山西省'
         },
     ],
@@ -17710,7 +17710,7 @@ DICTIONARY = {
         {
             'pinyin': 'Guǎng zhōu',
             'definition': '''1. Guangzhou subprovincial city and capital of Guangdong; 2. Canton; 3. Guangzhou subprovincial city and capital of Guangdong; 4. Canton''',
-            'frequency': 99.8999,
+            'frequency': 90.8999,
             'simplified': '广州'
         },
     ],
@@ -21654,7 +21654,7 @@ DICTIONARY = {
     ],
     '拜佛': [
         {
-            'pinyin': 'bài Fó',
+            'pinyin': 'bài fó',
             'definition': '''1. to worship Buddha''',
             'frequency': 97.4864,
             'simplified': '拜佛'
@@ -29716,7 +29716,7 @@ DICTIONARY = {
         {
             'pinyin': 'Shěn yáng shì',
             'definition': '''1. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 2. old names include Fengtian 奉天, Shengjing 盛京 and Mukden; 3. Shenyang subprovincial city and capital of Liaoning province 遼寧省|辽宁省 in northeast China; 4. old names include Fengtian 奉天, Shengjing 盛京 and Mukden''',
-            'frequency': 99.8817,
+            'frequency': 6.8817,
             'simplified': '沈阳市'
         },
     ],
@@ -30530,7 +30530,7 @@ DICTIONARY = {
     ],
     '燒香拜佛': [
         {
-            'pinyin': 'shāo xiāng bài Fó',
+            'pinyin': 'shāo xiāng bài fó',
             'definition': '''1. to burn incense and worship Buddha''',
             'frequency': 99.08,
             'simplified': '烧香拜佛'
@@ -35612,7 +35612,7 @@ DICTIONARY = {
         {
             'pinyin': 'Yuè',
             'definition': '''1. Cantonese; 2. short name for Guangdong 廣東|广东[Guǎng dōng]; 3. Cantonese; 4. short name for Guangdong 廣東|广东[Guǎng dōng]''',
-            'frequency': 99.8986,
+            'frequency': 25.8986,
             'simplified': '粤'
         },
     ],
@@ -40176,7 +40176,7 @@ DICTIONARY = {
         {
             'pinyin': 'Xī bān yá',
             'definition': '''1. Spain''',
-            'frequency': 99.883,
+            'frequency': 6.883,
             'simplified': '西班牙'
         },
     ],
@@ -46194,7 +46194,7 @@ DICTIONARY = {
     ],
     '阿彌陀佛': [
         {
-            'pinyin': 'Ē mí tuó Fó',
+            'pinyin': 'Ē mí tuó fó',
             'definition': '''1. Amitabha Buddha; 2. the Buddha of the Western paradise; 3. may the lord Buddha preserve us!; 4. merciful Buddha!''',
             'frequency': 86.8896,
             'simplified': '阿弥陀佛'
