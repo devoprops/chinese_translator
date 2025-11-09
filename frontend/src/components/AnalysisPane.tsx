@@ -299,10 +299,18 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
 
       {/* Translation */}
       <div>
-        <h2 className="text-xl font-semibold mb-3 text-gray-800">Translation</h2>
+        <h2 className="text-xl font-semibold mb-3 text-gray-800">Notional Translation</h2>
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-gray-800 leading-relaxed">{analysisData.translation}</p>
         </div>
+      </div>
+
+      {/* Navigation Hint */}
+      <div className="p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
+        <p className="text-sm text-gray-700">
+          💡 <strong>Tip:</strong> Double-click any phrase or character in the <strong>Chinese Text with Pinyin</strong> section below to jump to its detailed analysis. 
+          Double-click items in the <strong>Phrase and Character Analysis</strong> section to jump back up to the pinyin view.
+        </p>
       </div>
 
       {/* Chinese Text with Pinyin */}

@@ -105,7 +105,14 @@ const TextPane: React.FC<TextPaneProps> = ({
       // Only process if it contains Chinese characters
       if (/[\u4e00-\u9fff]/.test(selectedText)) {
         // Try to find the index of this sentence in the sentences array
-        const index = textData?.sentences.findIndex(s => s.trim() === selectedText.trim()) ?? -1;
+        // Normalize both strings by replacing all whitespace with single spaces
+        const normalizedSelection = selectedText.trim().replace(/\s+/g, ' ');
+        const index = textData?.sentences.findIndex(s => s.trim().replace(/\s+/g, ' ') === normalizedSelection) ?? -1;
+        
+        console.log('Mouse selection: Selected text:', selectedText);
+        console.log('Mouse selection: Normalized:', normalizedSelection);
+        console.log('Mouse selection: Found index:', index);
+        
         onSentenceSelect(selectedText, index); // Use found index or -1 if not found
       }
     }
@@ -153,7 +160,13 @@ const TextPane: React.FC<TextPaneProps> = ({
         }
         
         // Try to find the index of this sentence in the sentences array
-        const index = textData.sentences.findIndex(s => s.trim() === sentence.trim());
+        // Normalize both strings by replacing all whitespace with single spaces
+        const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
+        const index = textData.sentences.findIndex(s => s.trim().replace(/\s+/g, ' ') === normalizedSentence);
+        
+        console.log('Double-click: Found sentence:', sentence);
+        console.log('Double-click: Normalized:', normalizedSentence);
+        console.log('Double-click: Found index:', index);
         
         // Manually select the sentence text
         selectTextInDOM(sentence);
@@ -165,30 +178,52 @@ const TextPane: React.FC<TextPaneProps> = ({
   const findSentenceAtPosition = (range: Range): string | null => {
     if (!textData) return null;
     
-    // Get the character position in the text
+    // Get the text container
     const textContainer = range.startContainer.parentElement?.closest('.chinese-text');
     if (!textContainer) return null;
     
-    // Get all text content and find position
+    // Get the full raw text content (ignoring any HTML elements)
     const fullText = textData.content;
+    
+    // Get text content up to the click position, stripping all HTML
     const beforeRange = document.createRange();
     beforeRange.setStart(textContainer, 0);
     beforeRange.setEnd(range.startContainer, range.startOffset);
-    const position = beforeRange.toString().length;
+    const textBeforeClick = beforeRange.toString();
+    
+    // Find the position in the original content by searching for the surrounding context
+    // This is more robust than character counting when there are nested elements
+    let position = textBeforeClick.length;
+    
+    // Adjust position if we're clicking near the end to ensure we get a valid match
+    position = Math.min(position, fullText.length - 1);
     
     // Find sentence boundaries around this position
     const sentenceStart = findSentenceStart(fullText, position);
     const sentenceEnd = findSentenceEnd(fullText, position);
-    const foundSentence = fullText.substring(sentenceStart, sentenceEnd).trim();
+    let foundSentence = fullText.substring(sentenceStart, sentenceEnd).trim();
     
-    // If the found sentence is very short (like just "氣功"), 
-    // try to find a longer sentence from the pre-split sentences
-    if (foundSentence.length < 6) {
-      const textAtPosition = fullText.substring(Math.max(0, position - 2), position + 3);
+    // If the found sentence is very short or empty, try to match against pre-split sentences
+    if (foundSentence.length < 3) {
+      // Get a wider context around the click
+      const contextStart = Math.max(0, sentenceStart - 10);
+      const contextEnd = Math.min(fullText.length, sentenceEnd + 10);
+      const context = fullText.substring(contextStart, contextEnd);
+      
+      // Find the best matching sentence from the pre-split sentences
       for (const sentence of textData.sentences) {
-        if (sentence.includes(textAtPosition) && sentence.length > foundSentence.length) {
+        if (sentence.trim().length > 0 && context.includes(sentence.trim())) {
           return sentence;
         }
+      }
+    }
+    
+    // Try to find exact match in pre-split sentences for better accuracy
+    const normalizedFound = foundSentence.trim().replace(/\s+/g, ' ');
+    for (const sentence of textData.sentences) {
+      const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
+      if (normalizedSentence === normalizedFound) {
+        return sentence;
       }
     }
     
