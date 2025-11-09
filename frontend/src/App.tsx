@@ -8,6 +8,7 @@ import { analyzeText } from './services/api';
 function App() {
   const [textData, setTextData] = useState<TextData | null>(null);
   const [selectedSentence, setSelectedSentence] = useState<string>('');
+  const [selectedSentencePosition, setSelectedSentencePosition] = useState<number>(-1);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,7 +41,11 @@ function App() {
       // Clean the sentence: remove extra whitespace and newlines
       const cleanSentence = firstSentence.trim().replace(/\s+/g, ' ');
       
+      // Find position of first sentence in the content
+      const position = rawText.indexOf(firstSentence);
+      
       setSelectedSentence(firstSentence);
+      setSelectedSentencePosition(position);
       setCurrentSentenceIndex(0);
       setLoading(true);
       
@@ -56,16 +61,18 @@ function App() {
       }
     } else {
       setSelectedSentence('');
+      setSelectedSentencePosition(-1);
       setCurrentSentenceIndex(-1);
       setAnalysisData(null);
     }
   };
 
-  const handleSentenceSelect = async (sentence: string, index: number) => {
+  const handleSentenceSelect = async (sentence: string, index: number, position: number = -1) => {
     // Clean the sentence: remove extra whitespace and newlines
     const cleanSentence = sentence.trim().replace(/\s+/g, ' ');
     
     setSelectedSentence(sentence); // Keep original for display
+    setSelectedSentencePosition(position);
     setCurrentSentenceIndex(index);
     setLoading(true);
 
@@ -85,7 +92,8 @@ function App() {
     if (textData && currentSentenceIndex >= 0 && currentSentenceIndex < textData.sentences.length - 1) {
       const nextIndex = currentSentenceIndex + 1;
       const nextSentence = textData.sentences[nextIndex];
-      handleSentenceSelect(nextSentence, nextIndex);
+      const position = textData.content.indexOf(nextSentence, selectedSentencePosition + 1);
+      handleSentenceSelect(nextSentence, nextIndex, position);
     }
   };
 
@@ -93,7 +101,16 @@ function App() {
     if (textData && currentSentenceIndex > 0) {
       const prevIndex = currentSentenceIndex - 1;
       const prevSentence = textData.sentences[prevIndex];
-      handleSentenceSelect(prevSentence, prevIndex);
+      // Find from beginning since we're going backwards
+      let position = 0;
+      for (let i = 0; i < prevIndex; i++) {
+        const pos = textData.content.indexOf(textData.sentences[i], position);
+        if (pos !== -1) {
+          position = pos + textData.sentences[i].length;
+        }
+      }
+      position = textData.content.indexOf(prevSentence, position);
+      handleSentenceSelect(prevSentence, prevIndex, position);
     }
   };
 
@@ -134,6 +151,7 @@ function App() {
           <TextPane
             textData={textData}
             selectedSentence={selectedSentence}
+            selectedSentencePosition={selectedSentencePosition}
             currentIndex={currentSentenceIndex}
             onSentenceSelect={handleSentenceSelect}
             onLoadText={processText}

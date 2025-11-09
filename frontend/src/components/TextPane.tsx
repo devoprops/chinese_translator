@@ -5,14 +5,16 @@ import { detectScriptType } from '../services/api';
 interface TextPaneProps {
   textData: TextData | null;
   selectedSentence: string;
+  selectedSentencePosition: number;
   currentIndex: number;
-  onSentenceSelect: (sentence: string, index: number) => void;
+  onSentenceSelect: (sentence: string, index: number, position?: number) => void;
   onLoadText: (text: string) => void;
 }
 
 const TextPane: React.FC<TextPaneProps> = ({
   textData,
   selectedSentence,
+  selectedSentencePosition,
   currentIndex,
   onSentenceSelect,
   onLoadText,
@@ -59,7 +61,18 @@ const TextPane: React.FC<TextPaneProps> = ({
     }
 
     const content = textData.content;
-    const sentenceIndex = content.indexOf(selectedSentence);
+    
+    // Use the provided position if available, otherwise try to find it
+    let sentenceIndex = selectedSentencePosition >= 0 ? selectedSentencePosition : content.indexOf(selectedSentence);
+    
+    // Validate the position matches the sentence
+    if (sentenceIndex >= 0) {
+      const sentenceAtPosition = content.substring(sentenceIndex, sentenceIndex + selectedSentence.length);
+      if (sentenceAtPosition !== selectedSentence) {
+        // Position doesn't match, fall back to indexOf
+        sentenceIndex = content.indexOf(selectedSentence);
+      }
+    }
     
     if (sentenceIndex === -1) {
       // Sentence not found in content, just return content as-is
@@ -150,9 +163,11 @@ const TextPane: React.FC<TextPaneProps> = ({
       
       if (!range) return;
       
-      // Find the sentence at this position
-      const sentence = findSentenceAtPosition(range);
-      if (sentence) {
+      // Find the sentence at this position and get its position in the content
+      const result = findSentenceAtPosition(range);
+      if (result) {
+        const { sentence, position } = result;
+        
         // Clear selection again before setting our custom selection
         const sel = window.getSelection();
         if (sel) {
@@ -165,17 +180,18 @@ const TextPane: React.FC<TextPaneProps> = ({
         const index = textData.sentences.findIndex(s => s.trim().replace(/\s+/g, ' ') === normalizedSentence);
         
         console.log('Double-click: Found sentence:', sentence);
+        console.log('Double-click: Position in content:', position);
         console.log('Double-click: Normalized:', normalizedSentence);
         console.log('Double-click: Found index:', index);
         
-        // Manually select the sentence text
-        selectTextInDOM(sentence);
-        onSentenceSelect(sentence, index); // Use found index or -1 if not found
+        // Manually select the sentence text using the position
+        selectTextInDOM(sentence, position);
+        onSentenceSelect(sentence, index, position); // Pass the position
       }
     }, 0); // Run on next tick
   };
 
-  const findSentenceAtPosition = (range: Range): string | null => {
+  const findSentenceAtPosition = (range: Range): { sentence: string; position: number } | null => {
     if (!textData) return null;
     
     // Get the text container
@@ -193,15 +209,16 @@ const TextPane: React.FC<TextPaneProps> = ({
     
     // Find the position in the original content by searching for the surrounding context
     // This is more robust than character counting when there are nested elements
-    let position = textBeforeClick.length;
+    let clickPosition = textBeforeClick.length;
     
     // Adjust position if we're clicking near the end to ensure we get a valid match
-    position = Math.min(position, fullText.length - 1);
+    clickPosition = Math.min(clickPosition, fullText.length - 1);
     
     // Find sentence boundaries around this position
-    const sentenceStart = findSentenceStart(fullText, position);
-    const sentenceEnd = findSentenceEnd(fullText, position);
+    const sentenceStart = findSentenceStart(fullText, clickPosition);
+    const sentenceEnd = findSentenceEnd(fullText, clickPosition);
     let foundSentence = fullText.substring(sentenceStart, sentenceEnd).trim();
+    let actualStart = sentenceStart;
     
     // If the found sentence is very short or empty, try to match against pre-split sentences
     if (foundSentence.length < 3) {
@@ -213,7 +230,16 @@ const TextPane: React.FC<TextPaneProps> = ({
       // Find the best matching sentence from the pre-split sentences
       for (const sentence of textData.sentences) {
         if (sentence.trim().length > 0 && context.includes(sentence.trim())) {
-          return sentence;
+          // Find the position of this sentence in the full text
+          // Search around the click position to find the right occurrence
+          const searchStart = Math.max(0, clickPosition - 200);
+          const searchEnd = Math.min(fullText.length, clickPosition + 200);
+          const searchArea = fullText.substring(searchStart, searchEnd);
+          const localPos = searchArea.indexOf(sentence.trim());
+          if (localPos !== -1) {
+            actualStart = searchStart + localPos;
+            return { sentence, position: actualStart };
+          }
         }
       }
     }
@@ -223,11 +249,24 @@ const TextPane: React.FC<TextPaneProps> = ({
     for (const sentence of textData.sentences) {
       const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
       if (normalizedSentence === normalizedFound) {
-        return sentence;
+        // Find the position of this sentence near the click position
+        const searchStart = Math.max(0, clickPosition - 200);
+        const searchEnd = Math.min(fullText.length, clickPosition + 200);
+        const searchArea = fullText.substring(searchStart, searchEnd);
+        const localPos = searchArea.indexOf(sentence.trim());
+        if (localPos !== -1) {
+          actualStart = searchStart + localPos;
+          return { sentence, position: actualStart };
+        }
+        // Fallback: search in entire text
+        const globalPos = fullText.indexOf(sentence);
+        if (globalPos !== -1) {
+          return { sentence, position: globalPos };
+        }
       }
     }
     
-    return foundSentence;
+    return { sentence: foundSentence, position: actualStart };
   };
 
   const findSentenceStart = (text: string, position: number): number => {
@@ -262,32 +301,81 @@ const TextPane: React.FC<TextPaneProps> = ({
     return text.length; // End of text
   };
 
-  const selectTextInDOM = (text: string) => {
-    // Find and select the text in the DOM
+  const selectTextInDOM = (text: string, targetPosition: number = -1) => {
+    // Find and select the text in the DOM at the specific position
     const textContainer = document.querySelector('.chinese-text');
     if (!textContainer) return;
     
+    if (targetPosition < 0) {
+      // Fallback to old behavior if no position specified
+      const walker = document.createTreeWalker(
+        textContainer,
+        NodeFilter.SHOW_TEXT
+      );
+      
+      let node;
+      while ((node = walker.nextNode())) {
+        const nodeText = node.textContent || '';
+        const index = nodeText.indexOf(text);
+        if (index !== -1) {
+          const range = document.createRange();
+          range.setStart(node, index);
+          range.setEnd(node, index + text.length);
+          
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+          break;
+        }
+      }
+      return;
+    }
+    
+    // Use position-based selection
     const walker = document.createTreeWalker(
       textContainer,
       NodeFilter.SHOW_TEXT
     );
     
+    let currentPosition = 0;
     let node;
+    
     while ((node = walker.nextNode())) {
       const nodeText = node.textContent || '';
-      const index = nodeText.indexOf(text);
-      if (index !== -1) {
-        const range = document.createRange();
-        range.setStart(node, index);
-        range.setEnd(node, index + text.length);
+      const nodeLength = nodeText.length;
+      
+      // Check if target position falls within this text node
+      if (currentPosition <= targetPosition && targetPosition < currentPosition + nodeLength) {
+        // The target text starts in this node
+        const offsetInNode = targetPosition - currentPosition;
+        const endPosition = Math.min(offsetInNode + text.length, nodeLength);
         
-        const selection = window.getSelection();
-        if (selection) {
-          selection.removeAllRanges();
-          selection.addRange(range);
+        try {
+          const range = document.createRange();
+          range.setStart(node, offsetInNode);
+          
+          // Check if the entire text fits in this node
+          if (offsetInNode + text.length <= nodeLength) {
+            range.setEnd(node, offsetInNode + text.length);
+          } else {
+            // Text spans multiple nodes, just select what we can
+            range.setEnd(node, nodeLength);
+          }
+          
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        } catch (e) {
+          console.error('Error selecting text:', e);
         }
         break;
       }
+      
+      currentPosition += nodeLength;
     }
   };
 
