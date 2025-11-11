@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextData, ScriptType } from '../types/index';
 import { detectScriptType } from '../services/api';
 
@@ -23,6 +23,36 @@ const TextPane: React.FC<TextPaneProps> = ({
   const [showInput, setShowInput] = useState<boolean>(true);
   const [scriptType, setScriptType] = useState<ScriptType>('auto');
   const [detectedType, setDetectedType] = useState<ScriptType | null>(null);
+
+  // Auto-scroll to center the selected sentence when it changes
+  useEffect(() => {
+    if (!selectedSentence || !textData) return;
+    
+    // Give the DOM a moment to update with the new highlight
+    const timer = setTimeout(() => {
+      // Find the highlighted sentence span
+      const highlightedElement = document.querySelector('.chinese-text .bg-yellow-200');
+      
+      if (highlightedElement) {
+        // Check if the container is scrollable
+        const container = highlightedElement.closest('.left-pane');
+        if (container) {
+          const containerHeight = container.clientHeight;
+          const containerScrollHeight = container.scrollHeight;
+          
+          // Only scroll if content is actually scrollable
+          if (containerScrollHeight > containerHeight) {
+            highlightedElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center'
+            });
+          }
+        }
+      }
+    }, 100); // Small delay to ensure DOM is updated
+    
+    return () => clearTimeout(timer);
+  }, [selectedSentence, selectedSentencePosition, textData]);
 
   const handleLoadText = async () => {
     if (inputText.trim()) {
