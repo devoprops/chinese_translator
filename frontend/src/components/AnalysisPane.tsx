@@ -291,6 +291,14 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Navigation Hint */}
+      <div className="p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
+        <p className="text-sm text-gray-700">
+          💡 <strong>Tip:</strong> Double-click any phrase or character in the <strong>Chinese Text with Pinyin</strong> section below to jump to its detailed analysis. 
+          Double-click items in the <strong>Phrase and Character Analysis</strong> section to jump back up to the pinyin view.
+        </p>
+      </div>
+
       {/* Current Sentence */}
       <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
         <h3 className="font-semibold text-gray-700 mb-2">Current Sentence:</h3>
@@ -303,14 +311,6 @@ const AnalysisPane: React.FC<AnalysisPaneProps> = ({
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-gray-800 leading-relaxed">{analysisData.translation}</p>
         </div>
-      </div>
-
-      {/* Navigation Hint */}
-      <div className="p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
-        <p className="text-sm text-gray-700">
-          💡 <strong>Tip:</strong> Double-click any phrase or character in the <strong>Chinese Text with Pinyin</strong> section below to jump to its detailed analysis. 
-          Double-click items in the <strong>Phrase and Character Analysis</strong> section to jump back up to the pinyin view.
-        </p>
       </div>
 
       {/* Chinese Text with Pinyin */}
