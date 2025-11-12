@@ -248,7 +248,13 @@ const TextPane: React.FC<TextPaneProps> = ({
     const sentenceStart = findSentenceStart(fullText, clickPosition);
     const sentenceEnd = findSentenceEnd(fullText, clickPosition);
     let foundSentence = fullText.substring(sentenceStart, sentenceEnd).trim();
-    let actualStart = sentenceStart;
+    
+    // IMPORTANT: The actualStart should be where we found the sentence in the original text
+    // Use the sentenceStart directly since it's from the fullText
+    let actualStart = fullText.indexOf(foundSentence, Math.max(0, sentenceStart - 10));
+    if (actualStart === -1) {
+      actualStart = sentenceStart;
+    }
     
     // If the found sentence is very short or empty, try to match against pre-split sentences
     if (foundSentence.length < 3) {
@@ -260,15 +266,22 @@ const TextPane: React.FC<TextPaneProps> = ({
       // Find the best matching sentence from the pre-split sentences
       for (const sentence of textData.sentences) {
         if (sentence.trim().length > 0 && context.includes(sentence.trim())) {
-          // Find the position of this sentence in the full text
-          // Search around the click position to find the right occurrence
-          const searchStart = Math.max(0, clickPosition - 200);
-          const searchEnd = Math.min(fullText.length, clickPosition + 200);
-          const searchArea = fullText.substring(searchStart, searchEnd);
-          const localPos = searchArea.indexOf(sentence.trim());
-          if (localPos !== -1) {
-            actualStart = searchStart + localPos;
-            return { sentence, position: actualStart };
+          // Find the closest occurrence to our click position
+          let bestPos = -1;
+          let bestDistance = Infinity;
+          let searchPos = 0;
+          
+          while ((searchPos = fullText.indexOf(sentence.trim(), searchPos)) !== -1) {
+            const distance = Math.abs(searchPos - clickPosition);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestPos = searchPos;
+            }
+            searchPos++;
+          }
+          
+          if (bestPos !== -1) {
+            return { sentence, position: bestPos };
           }
         }
       }
@@ -279,19 +292,24 @@ const TextPane: React.FC<TextPaneProps> = ({
     for (const sentence of textData.sentences) {
       const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
       if (normalizedSentence === normalizedFound) {
-        // Find the position of this sentence near the click position
-        const searchStart = Math.max(0, clickPosition - 200);
-        const searchEnd = Math.min(fullText.length, clickPosition + 200);
-        const searchArea = fullText.substring(searchStart, searchEnd);
-        const localPos = searchArea.indexOf(sentence.trim());
-        if (localPos !== -1) {
-          actualStart = searchStart + localPos;
-          return { sentence, position: actualStart };
+        // Find the closest occurrence to our click position
+        // This handles duplicate sentences in the text
+        let bestPos = -1;
+        let bestDistance = Infinity;
+        let searchPos = 0;
+        const sentenceTrimmed = sentence.trim();
+        
+        while ((searchPos = fullText.indexOf(sentenceTrimmed, searchPos)) !== -1) {
+          const distance = Math.abs(searchPos - clickPosition);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestPos = searchPos;
+          }
+          searchPos++;
         }
-        // Fallback: search in entire text
-        const globalPos = fullText.indexOf(sentence);
-        if (globalPos !== -1) {
-          return { sentence, position: globalPos };
+        
+        if (bestPos !== -1) {
+          return { sentence, position: bestPos };
         }
       }
     }
